@@ -1,12 +1,15 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import { useParams } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 import { API_BASE_URL } from './config';
+import NoteForm from './NoteForm';
 
 function PropertyDetails() {
   const [property, setProperty] = useState(null);
   const [notes, setNotes] = useState([]);
+  const [showNoteForm, setShowNoteForm] = useState(false);
   const { id } = useParams();
+  const navigate = useNavigate();
 
   useEffect(() => {
     // Fetch property details
@@ -22,6 +25,23 @@ function PropertyDetails() {
       });
   }, [id]);
 
+  const handleAddNote = () => {
+    // Toggle the note form
+    setShowNoteForm(!showNoteForm);
+  };
+
+  const handleBack = () => {
+    // Navigate back to the previous page
+    navigate(-1);
+  };
+
+  const handleNoteAdded = (note) => {
+    // Add the new note to the notes state
+    setNotes(prevNotes => [...prevNotes, note]);
+    // Hide the note form
+    setShowNoteForm(false);
+  };
+
   if (!property) {
     return <div>Loading...</div>;
   }
@@ -30,6 +50,13 @@ function PropertyDetails() {
     <div>
       <h2>{property.propertyName}</h2>
       <p>{property.address}, {property.city}</p>
+
+      <button onClick={handleBack}>Go Back</button>
+      <button onClick={handleAddNote}>{showNoteForm ? 'Close Note' : 'Add Note'}</button>
+
+      {/* Show the note form if showNoteForm is true */}
+      {showNoteForm && <NoteForm propertyId={id} onNoteAdded={handleNoteAdded} />}
+
       {/* Display notes */}
       {notes.map(note => (
         <div key={note.id}>

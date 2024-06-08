@@ -26,7 +26,7 @@ function NoteForm({ propertyId, onNoteAdded }) {
   return (
     <form onSubmit={handleAddNote}>
       <input name="content" value={newNote.content} onChange={handleNoteChange} placeholder="Note content" />
-      <input type="checkbox" name="isTrue" checked={newNote.isTrue} onChange={handleNoteChange} /> Is True?
+      <input type="checkbox" name="isTrue" checked={newNote.isTrue} onChange={handleNoteChange} /> Tehty?
       <button type="submit">Add Note</button>
     </form>
   );

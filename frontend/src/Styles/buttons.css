@@ -1,0 +1,16 @@
+.default-button {
+    background-color: #512685;
+    color: white;
+    border: none;
+    padding: 8px 16px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 12px;
+    margin: 4px 2px;
+    cursor: pointer;
+}
+
+.default-button:hover {
+    background-color: #6a3e9e;
+}

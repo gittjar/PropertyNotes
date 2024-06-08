@@ -3,6 +3,7 @@ import axios from 'axios';
 import { useParams, useNavigate } from 'react-router-dom';
 import { API_BASE_URL } from './config';
 import NoteForm from './NoteForm';
+import './Styles/buttons.css';
 
 function PropertyDetails() {
   const [property, setProperty] = useState(null);
@@ -51,8 +52,9 @@ function PropertyDetails() {
       <h2>{property.propertyName}</h2>
       <p>{property.address}, {property.city}</p>
 
-      <button onClick={handleBack}>Go Back</button>
-      <button onClick={handleAddNote}>{showNoteForm ? 'Close Note' : 'Add Note'}</button>
+      <button onClick={handleBack} className='default-button'>Go Back</button>
+      <button onClick={handleAddNote} className='default-button' >{showNoteForm ? 'Close Note' : 'Add Note'}</button>
+
 
       {/* Show the note form if showNoteForm is true */}
       {showNoteForm && <NoteForm propertyId={id} onNoteAdded={handleNoteAdded} />}

@@ -19,6 +19,18 @@ input {
     border-radius: 1px;
 }
 
+.input-addnote {
+    width: 100%;
+    padding: 12px;
+    margin: 8px 0;
+    display: inline-block;
+    border: 1px solid #512685;
+    border-radius: 4px;
+    box-sizing: border-box;
+}
+
+/* TABLE */
+
 .property-table {
     width: 100%;
     border-collapse: collapse;
@@ -34,3 +46,35 @@ input {
 .property-table td {
     padding: 4px;
 }
+
+.property-table tr:nth-child(even) {
+    background-color: #f2f2f2;
+}
+
+/* Modal */
+.ReactModal__Overlay {
+    background-color: rgba(0, 0, 0, 0.75);
+  }
+  
+  .ReactModal__Content {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    right: auto;
+    bottom: auto;
+    transform: translate(-50%, -50%);
+    background-color: #fff;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    padding: 20px;
+  }
+
+  .note-card {
+    width: 20rem;
+    font-size: smaller;
+    background-color: #f2f2f2;
+    border: 1px solid #512685;
+    border-radius: 2px;
+    padding-left: 0.4rem;
+    margin: 4px 0;
+  }

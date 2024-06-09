@@ -1,8 +1,10 @@
 import React, { useState } from 'react';
 import axios from 'axios';
 import { API_BASE_URL } from './config';
+import './Styles/styles.css';
+import './Styles/buttons.css';
 
-function NoteForm({ propertyId, onNoteAdded }) {
+function NoteForm({ propertyId, onNoteAdded, propertyName }) {
   const [newNote, setNewNote] = useState({ content: '', isTrue: false });
 
   const handleNoteChange = (event) => {
@@ -25,9 +27,12 @@ function NoteForm({ propertyId, onNoteAdded }) {
 
   return (
     <form onSubmit={handleAddNote}>
-      <input name="content" value={newNote.content} onChange={handleNoteChange} placeholder="Note content" />
+      <h3>Lisää tehtävä</h3>
+      <p>{propertyName}</p>
+      <textarea name="content" value={newNote.content} onChange={handleNoteChange} placeholder="Note content" className='input-addnote' />
       <input type="checkbox" name="isTrue" checked={newNote.isTrue} onChange={handleNoteChange} /> Tehty?
-      <button type="submit">Add Note</button>
+      <hr></hr>
+      <button type="submit" className='add-button'>Add Note</button>
     </form>
   );
 }

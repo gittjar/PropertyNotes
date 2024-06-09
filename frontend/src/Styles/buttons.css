@@ -14,3 +14,20 @@
 .default-button:hover {
     background-color: #6a3e9e;
 }
+
+.add-button {
+    background-color: #72de0e;
+    color: black;
+    border: none;
+    padding: 8px 16px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 12px;
+    margin: 4px 2px;
+    cursor: pointer;
+}
+
+.add-button:hover {
+    background-color: #a3f23e;
+}

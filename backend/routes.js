@@ -2,6 +2,8 @@ const express = require('express');
 const router = express.Router();
 const Property = require('./models/property');
 const Note = require('./models/note');
+const { ObjectId } = require('mongodb');
+
 
 
 router.get('/', (req, res) => {
@@ -51,10 +53,12 @@ router.delete('/api/properties/:id', (req, res) => {
 
 
 router.post('/api/properties/:id/notes', (req, res) => {
+  const alarmDays = req.body.alarmDays || 7; // Default to 7 if not provided
   const newNote = new Note({
     content: req.body.content,
     isTrue: req.body.isTrue,
-    property: req.params.id
+    property: req.params.id,
+    alarmTime: new Date(Date.now() + alarmDays * 24 * 60 * 60 * 1000) // Current time + alarmDays days
   });
 
   newNote.save()
@@ -82,6 +86,71 @@ router.put('/api/notes/:id', (req, res) => {
       return note.save();
     })
     .then(() => res.json('Note updated!'))
+    .catch(err => {
+      console.error(err);
+      res.status(400).json('Error: ' + err);
+    });
+});
+
+router.delete('/api/notes/:id', (req, res) => {
+  const noteId = req.params.id;
+  if (!ObjectId.isValid(noteId)) {
+    return res.status(400).send('Invalid note id');
+  }
+  Note.findByIdAndDelete(req.params.id)
+    .then(() => res.json('Note deleted!'))
+    .catch(err => {
+      console.error(err);
+      res.status(400).json('Error: ' + err);
+    });
+});
+
+/*SUBNOTES*/
+
+// Add a subnote to a note
+router.post('/api/notes/:id/subnotes', (req, res) => {
+  Note.findById(req.params.id)
+    .then(note => {
+      note.subnotes.push({
+        content: req.body.content,
+        isTrue: req.body.isTrue,
+
+        // Add any other fields you want for your subnotes
+      });
+      return note.save();
+    })
+    .then(() => res.json('Subnote added!'))
+    .catch(err => {
+      console.error(err);
+      res.status(400).json('Error: ' + err);
+    });
+});
+
+// Update a subnote of a note
+router.put('/api/notes/:noteId/subnotes/:subnoteId', (req, res) => {
+  Note.findById(req.params.noteId)
+    .then(note => {
+      const subnote = note.subnotes.id(req.params.subnoteId);
+      subnote.content = req.body.content;
+      subnote.isTrue = req.body.isTrue;
+      // Update any other fields you want for your subnotes
+      return note.save();
+    })
+    .then(() => res.json('Subnote updated!'))
+    .catch(err => {
+      console.error(err);
+      res.status(400).json('Error: ' + err);
+    });
+});
+
+// Delete a subnote of a note
+router.delete('/api/notes/:noteId/subnotes/:subnoteId', (req, res) => {
+  Note.findById(req.params.noteId)
+    .then(note => {
+      note.subnotes.id(req.params.subnoteId).remove();
+      return note.save();
+    })
+    .then(() => res.json('Subnote deleted!'))
     .catch(err => {
       console.error(err);
       res.status(400).json('Error: ' + err);

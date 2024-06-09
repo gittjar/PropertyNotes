@@ -4,11 +4,17 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { API_BASE_URL } from './config';
 import NoteForm from './NoteForm';
 import './Styles/buttons.css';
+import './Styles/styles.css';
+import Modal from 'react-modal';
+
+Modal.setAppElement('#root');
 
 function PropertyDetails() {
   const [property, setProperty] = useState(null);
   const [notes, setNotes] = useState([]);
-  const [showNoteForm, setShowNoteForm] = useState(false);
+  const [confirmModalIsOpen, setConfirmModalIsOpen] = useState(false);
+  const [modalIsOpen, setModalIsOpen] = useState(false);
+const [noteToDelete, setNoteToDelete] = useState(null);
   const { id } = useParams();
   const navigate = useNavigate();
 
@@ -26,9 +32,12 @@ function PropertyDetails() {
       });
   }, [id]);
 
-  const handleAddNote = () => {
-    // Toggle the note form
-    setShowNoteForm(!showNoteForm);
+  const handleOpenModal = () => {
+    setModalIsOpen(true);
+  };
+
+  const handleCloseModal = () => {
+    setModalIsOpen(false);
   };
 
   const handleBack = () => {
@@ -36,11 +45,38 @@ function PropertyDetails() {
     navigate(-1);
   };
 
-  const handleNoteAdded = (note) => {
-    // Add the new note to the notes state
-    setNotes(prevNotes => [...prevNotes, note]);
-    // Hide the note form
-    setShowNoteForm(false);
+  const handleNoteAdded = () => {
+    // Fetch related notes
+    axios.get(`${API_BASE_URL}/api/properties/${id}/notes`)
+      .then(response => {
+        setNotes(response.data);
+      });
+    // Close the modal
+    handleCloseModal();
+  };
+
+  const handleNoteDelete = () => {
+    if (noteToDelete) {
+      axios.delete(`${API_BASE_URL}/api/notes/${noteToDelete}`)
+        .then(() => {
+          // Fetch related notes
+          axios.get(`${API_BASE_URL}/api/properties/${id}/notes`)
+            .then(response => {
+              setNotes(response.data);
+            });
+        });
+    }
+    // Close the confirmation modal
+    setConfirmModalIsOpen(false);
+  };
+  
+  const openConfirmModal = (noteId) => {
+    setNoteToDelete(noteId);
+    setConfirmModalIsOpen(true);
+  };
+  
+  const closeConfirmModal = () => {
+    setConfirmModalIsOpen(false);
   };
 
   if (!property) {
@@ -54,22 +90,43 @@ function PropertyDetails() {
 
       <p>Total notes: {notes.length}</p>
       <p>Completed notes: {notes.filter(note => note.isTrue).length}</p>
-     <p>Alert notes: {notes.filter(note => !note.isTrue).length}</p>
+      <p>Alert notes: {notes.filter(note => !note.isTrue).length}</p>
 
       <button onClick={handleBack} className='default-button'>Go Back</button>
-      <button onClick={handleAddNote} className='default-button' >{showNoteForm ? 'Close Note' : 'Add Note'}</button>
+      <button onClick={handleOpenModal} className='default-button'>Add Note</button>
 
-
-      {/* Show the note form if showNoteForm is true */}
-      {showNoteForm && <NoteForm propertyId={id} onNoteAdded={handleNoteAdded} />}
+      <Modal
+        isOpen={modalIsOpen}
+        onRequestClose={handleCloseModal}
+        contentLabel="Note Form"
+        overlayClassName="ReactModal__Overlay"
+        className="ReactModal__Content"
+      >
+        <NoteForm propertyId={id} onNoteAdded={handleNoteAdded} />
+        <button onClick={handleCloseModal} className='default-button'>Close Note</button>
+      </Modal>
 
       {/* Display notes */}
       {notes.map(note => (
-        <div key={note.id}>
+        <div key={note.id} className='note-card'>
           <h3>{note.title}</h3>
           <p>{note.content}</p>
+          <p>Tilanne: {note.isTrue ? 'Tehty' : 'Avoin'}</p>
+          <button onClick={() => openConfirmModal(note._id)} className='default-button'>Delete Note</button>        
         </div>
       ))}
+
+          <Modal
+            isOpen={confirmModalIsOpen}
+            onRequestClose={closeConfirmModal}
+            contentLabel="Confirm Deletion"
+            overlayClassName="ReactModal__Overlay"
+            className="ReactModal__Content"
+          >
+            <h2>Poistetaanko tämä, oletko varma?</h2>
+            <button onClick={handleNoteDelete} className='default-button'>Kyllä, poista</button>
+            <button onClick={closeConfirmModal} className='default-button'>Ei, älä poista</button>
+          </Modal>
     </div>
   );
 }

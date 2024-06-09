@@ -107,6 +107,16 @@ router.delete('/api/notes/:id', (req, res) => {
 
 /*SUBNOTES*/
 
+// Get all subnotes of a note
+router.get('/api/notes/:id/subnotes', (req, res) => {
+  Note.findById(req.params.id)
+    .then(note => res.json(note.subnotes))
+    .catch(err => {
+      console.error(err);
+      res.status(400).json('Error: ' + err);
+    });
+});
+
 // Add a subnote to a note
 router.post('/api/notes/:id/subnotes', (req, res) => {
   Note.findById(req.params.id)
@@ -114,7 +124,7 @@ router.post('/api/notes/:id/subnotes', (req, res) => {
       note.subnotes.push({
         content: req.body.content,
         isTrue: req.body.isTrue,
-
+        timestamp: new Date(),
         // Add any other fields you want for your subnotes
       });
       return note.save();
@@ -133,6 +143,7 @@ router.put('/api/notes/:noteId/subnotes/:subnoteId', (req, res) => {
       const subnote = note.subnotes.id(req.params.subnoteId);
       subnote.content = req.body.content;
       subnote.isTrue = req.body.isTrue;
+      timestamp: new Date();
       // Update any other fields you want for your subnotes
       return note.save();
     })

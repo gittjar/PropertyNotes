@@ -31,3 +31,22 @@
 .add-button:hover {
     background-color: #a3f23e;
 }
+
+.delete-button {
+    background-color: #f23e3e;
+    color: white;
+    border: none;
+    padding: 8px 16px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 12px;
+    margin: 4px 2px;
+    cursor: pointer;
+    width: fit-content;
+
+}
+
+.delete-button:hover {
+    background-color: #e40808;
+}

@@ -89,7 +89,7 @@ function App() {
       <td>{property.address}</td>
       <td>{property.city}</td>
       <td>
-              <button onClick={() => handleOpenModal(property._id)}>
+              <button onClick={() => handleOpenModal(property._id)} className='add-button'>
                 Add Note
               </button>
               <Modal

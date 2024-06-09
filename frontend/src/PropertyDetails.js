@@ -3,6 +3,7 @@ import axios from 'axios';
 import { useParams, useNavigate } from 'react-router-dom';
 import { API_BASE_URL } from './config';
 import NoteForm from './NoteForm';
+import SubnoteForm from './SubnoteForm';
 import './Styles/buttons.css';
 import './Styles/styles.css';
 import Modal from 'react-modal';
@@ -26,11 +27,28 @@ const [noteToDelete, setNoteToDelete] = useState(null);
       });
 
     // Fetch related notes
-    axios.get(`${API_BASE_URL}/api/properties/${id}/notes`)
-      .then(response => {
-        setNotes(response.data);
-      });
-  }, [id]);
+  // Fetch related notes
+  axios.get(`${API_BASE_URL}/api/properties/${id}/notes`)
+    .then(response => {
+      const fetchedNotes = response.data;
+
+      // Fetch subnotes for each note
+      const promises = fetchedNotes.map(note =>
+        axios.get(`${API_BASE_URL}/api/notes/${note._id}/subnotes`)
+      );
+
+      Promise.all(promises)
+        .then(subnoteResponses => {
+          const notesWithSubnotes = fetchedNotes.map((note, index) => ({
+            ...note,
+            subnotes: subnoteResponses[index].data
+          }));
+
+          setNotes(notesWithSubnotes);
+        });
+    });
+}, [id]);
+
 
   const handleOpenModal = () => {
     setModalIsOpen(true);
@@ -83,6 +101,14 @@ const [noteToDelete, setNoteToDelete] = useState(null);
     return <div>Loading...</div>;
   }
 
+  const handleSubnoteAdded = () => {
+    // Fetch related notes
+    axios.get(`${API_BASE_URL}/api/properties/${id}/notes`)
+      .then(response => {
+        setNotes(response.data);
+      });
+  };
+
   return (
     <div>
       <h2>{property.propertyName}</h2>
@@ -109,11 +135,41 @@ const [noteToDelete, setNoteToDelete] = useState(null);
       {/* Display notes */}
       {notes.map(note => (
         <div key={note.id} className='note-card'>
-          <h3>{note.title}</h3>
-          <p>{note.content}</p>
-          <p>Tilanne: {note.isTrue ? 'Tehty' : 'Avoin'}</p>
-          <button onClick={() => openConfirmModal(note._id)} className='default-button'>Delete Note</button>        
-        </div>
+<article className='note-info'>
+  <h4>{note.content}</h4>
+  <p className="note-info-row">Created at: {new Date(note.createdAt).toLocaleString()}</p>
+  <p className="note-info-row">Last updated at: {new Date(note.updatedAt).toLocaleString()}</p>
+  <p className="note-info-row">Status: {note.isTrue ? 'Completed' : 'Open'}</p>
+  <button onClick={() => openConfirmModal(note._id)} className='delete-button'>Delete Note</button>        
+</article>
+    {/* Display subnotes */}
+    <article className='subnotes'>
+  <h4>Subnotes</h4>
+  <table className='subnote-table'>
+    <thead>
+      <tr>
+        <th>Content</th>
+        <th>Created At</th>
+        <th>Last Updated At</th>
+        <th>Status</th>
+      </tr>
+    </thead>
+    <tbody>
+      {note.subnotes.map(subnote => (
+        <tr key={subnote._id}>
+          <td>{subnote.content}</td>
+          <td>{new Date(subnote.createdAt).toLocaleString()}</td>
+          <td>{new Date(subnote.updatedAt).toLocaleString()}</td>
+          <td>{subnote.isTrue ? 'Completed' : 'Open'}</td>
+        </tr>
+      ))}
+    </tbody>
+  </table>
+</article>
+
+         {/* Add SubnoteForm for each note */}
+         <SubnoteForm noteId={note._id} onSubnoteAdded={handleSubnoteAdded} />       
+          </div>
       ))}
 
           <Modal

@@ -12,6 +12,14 @@ a:hover {
     color: #6a3e9e;
 }
 
+textarea {
+    font-size: 0.8rem;
+    padding: 6px;
+    border: 1px solid #512685;
+    border-radius: 1px;
+    height: 50%;
+}
+
 input {
     font-size: 0.8rem;
     padding: 6px;
@@ -27,6 +35,7 @@ input {
     border: 1px solid #512685;
     border-radius: 4px;
     box-sizing: border-box;
+    height: 50%;
 }
 
 /* TABLE */
@@ -70,11 +79,58 @@ input {
   }
 
   .note-card {
-    width: 20rem;
+    width: 99%;
     font-size: smaller;
     background-color: #f2f2f2;
     border: 1px solid #512685;
     border-radius: 2px;
-    padding-left: 0.4rem;
-    margin: 4px 0;
+    padding: 0.4rem;
+    margin: 0.5rem 0;
+    margin-right: 0.5rem;
+    display: flex;
+    flex-direction: row;
   }
+
+  .note-info {
+    width: 20%;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .note-info-row {
+    margin: 4px 0; /* Adjust as needed */
+    padding: 0; /* Adjust as needed */
+    font-size: small;
+  }
+
+  .subnotes {
+    width: 70%;
+    background-color: #f2f2f2;
+    border: 1px solid #512685;
+    border-radius: 2px;
+    padding: 0.4rem;
+    margin-left: 0.5rem;
+    margin-right: 0.5rem;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .subnote-table {
+    width: 100%;
+    border-collapse: collapse;
+  }
+
+    .subnote-table th {
+        background-color: #512685;
+        color: white;
+        padding: 8px;
+        text-align: left;
+    }
+
+    .subnote-table td {
+        padding: 4px;
+    }
+
+    .subnote-table tr:nth-child(even) {
+        background-color: #f2f2f2;
+    }

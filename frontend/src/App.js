@@ -5,26 +5,53 @@ import NoteForm from './NoteForm';
 import { API_BASE_URL } from './config';
 import { BsArrowUpRight } from "react-icons/bs";
 import './Styles/styles.css';
+import Modal from 'react-modal';
+
+Modal.setAppElement('#root');
+
 
 function App() {
   const [properties, setProperties] = useState([]);
+  const [showNoteForm, setShowNoteForm] = useState(false);
+  const [modalPropertyId, setModalPropertyId] = useState(null); // Add this line
+
+
+  const handleOpenModal = (id) => {
+    setModalPropertyId(id);
+  };
+
+  const handleCloseModal = () => {
+    setModalPropertyId(null);
+  };
+
 
   useEffect(() => {
     axios.get(`${API_BASE_URL}/api/properties`)
       .then(response => {
-        setProperties(response.data);
+        const properties = response.data;
+        const promises = properties.map(property =>
+          axios.get(`${API_BASE_URL}/api/properties/${property._id}/notes`)
+        );
+        Promise.all(promises)
+          .then(noteResponses => {
+            const propertiesWithNotes = properties.map((property, index) => ({
+              ...property,
+              notes: noteResponses[index].data,
+              showNoteForm: false, // Add this line
+            }));
+            setProperties(propertiesWithNotes);
+          });
       });
   }, []);
 
-  const handleNoteAdded = (propertyId, newNote) => {
-    setProperties(properties.map(property =>
-      property._id === propertyId
-        ? { 
-            ...property, 
-            notes: Array.isArray(property.notes) ? [...property.notes, newNote] : [newNote]
-          }
-        : property
-    ));
+  const handleToggleNoteForm = (id) => {
+    setProperties(prevProperties =>
+      prevProperties.map(property =>
+        property._id === id
+          ? { ...property, showNoteForm: !property.showNoteForm }
+          : property
+      )
+    );
   };
 
   return (
@@ -50,13 +77,23 @@ function App() {
           </Link>
         </td>
         <td>{Array.isArray(property.notes) ? property.notes.filter(note => !note.isTrue).length : 0}</td>
-        <td>{Array.isArray(property.notes) ? property.notes.length : 0}</td>
-        <td>{Array.isArray(property.notes) ? property.notes.filter(note => note.isTrue).length : 0}</td>
-        <td>{property.address}</td>
-        <td>{property.city}</td>
-        <td>
-          <NoteForm propertyId={property._id} onNoteAdded={(newNote) => handleNoteAdded(property._id, newNote)} />
-        </td>
+      <td>{Array.isArray(property.notes) ? property.notes.length : 0}</td>
+      <td>{Array.isArray(property.notes) ? property.notes.filter(note => note.isTrue).length : 0}</td>
+      <td>{property.address}</td>
+      <td>{property.city}</td>
+      <td>
+              <button onClick={() => handleOpenModal(property._id)}>
+                Add Note
+              </button>
+              <Modal
+                isOpen={modalPropertyId === property._id}
+                onRequestClose={handleCloseModal}
+                contentLabel="Note Form"
+              >
+                <NoteForm propertyId={property._id} onNoteAdded={(newNote) => handleNoteAdded(property._id, newNote)} />
+                <button onClick={handleCloseModal}>Close Note</button>
+              </Modal>
+            </td>
       </tr>
     ))}
   </tbody>

@@ -52,6 +52,10 @@ function PropertyDetails() {
       <h2>{property.propertyName}</h2>
       <p>{property.address}, {property.city}</p>
 
+      <p>Total notes: {notes.length}</p>
+      <p>Completed notes: {notes.filter(note => note.isTrue).length}</p>
+     <p>Alert notes: {notes.filter(note => !note.isTrue).length}</p>
+
       <button onClick={handleBack} className='default-button'>Go Back</button>
       <button onClick={handleAddNote} className='default-button' >{showNoteForm ? 'Close Note' : 'Add Note'}</button>
 

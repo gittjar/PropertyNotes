@@ -4,22 +4,30 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { API_BASE_URL } from './config';
 import NoteForm from './NoteForm';
 import SubnoteForm from './SubnoteForm';
+import SubnoteEditForm from './SubnoteEditForm';
 import './Styles/buttons.css';
 import './Styles/styles.css';
 import Modal from 'react-modal';
 
 Modal.setAppElement('#root');
 
-function PropertyDetails() {
+function PropertyDetails(){
   const [property, setProperty] = useState(null);
   const [notes, setNotes] = useState([]);
+  const [noteIdToEdit, setNoteIdToEdit] = useState(null);
   const [confirmModalIsOpen, setConfirmModalIsOpen] = useState(false);
   const [modalIsOpen, setModalIsOpen] = useState(false);
-const [noteToDelete, setNoteToDelete] = useState(null);
+  const [noteToDelete, setNoteToDelete] = useState(null);
   const { id } = useParams();
   const navigate = useNavigate();
+  const [subnoteEditModalIsOpen, setSubnoteEditModalIsOpen] = useState(false);
+  const [subnoteToEdit, setSubnoteToEdit] = useState(null);
+
+  
 
   useEffect(() => {
+
+    
     // Fetch property details
     axios.get(`${API_BASE_URL}/api/properties/${id}`)
       .then(response => {
@@ -109,6 +117,46 @@ const [noteToDelete, setNoteToDelete] = useState(null);
       });
   };
 
+  const handleSubnoteUpdated = () => {
+    // Fetch related notes
+    axios.get(`${API_BASE_URL}/api/properties/${id}/notes`)
+      .then(response => {
+        const fetchedNotes = response.data;
+
+        // Fetch subnotes for each note
+        const promises = fetchedNotes.map(note =>
+          axios.get(`${API_BASE_URL}/api/notes/${note._id}/subnotes`)
+        );
+
+        Promise.all(promises)
+          .then(subnoteResponses => {
+            const notesWithSubnotes = fetchedNotes.map((note, index) => ({
+              ...note,
+              subnotes: subnoteResponses[index].data
+            }));
+
+            setNotes(notesWithSubnotes);
+          });
+      });
+
+    // Close the subnote edit modal
+    handleCloseSubnoteEditModal();
+};
+
+
+const handleOpenSubnoteEditModal = (noteId, subnoteId) => {
+  console.log('Opening subnote edit modal with noteId:', noteId, 'and subnoteId:', subnoteId);
+  setNoteIdToEdit(noteId);
+  setSubnoteToEdit(subnoteId);
+  setSubnoteEditModalIsOpen(true);
+};
+
+  const handleCloseSubnoteEditModal = () => {
+    setSubnoteEditModalIsOpen(false);
+  };
+
+
+
   return (
     <div>
       <h2>{property.propertyName}</h2>
@@ -161,7 +209,10 @@ const [noteToDelete, setNoteToDelete] = useState(null);
           <td>{new Date(subnote.createdAt).toLocaleString()}</td>
           <td>{new Date(subnote.updatedAt).toLocaleString()}</td>
           <td>{subnote.isTrue ? 'Completed' : 'Open'}</td>
-        </tr>
+          <td>
+          <button onClick={() => handleOpenSubnoteEditModal(note._id, subnote._id)} className='edit-link-button'>Edit</button>        
+          </td>
+          </tr>
       ))}
     </tbody>
   </table>
@@ -183,6 +234,18 @@ const [noteToDelete, setNoteToDelete] = useState(null);
             <button onClick={handleNoteDelete} className='default-button'>Kyllä, poista</button>
             <button onClick={closeConfirmModal} className='default-button'>Ei, älä poista</button>
           </Modal>
+
+          <Modal
+            isOpen={subnoteEditModalIsOpen}
+            onRequestClose={handleCloseSubnoteEditModal}
+            contentLabel="Subnote Edit Form"
+            overlayClassName="ReactModal__Overlay"
+            className="ReactModal__Content"
+          >
+            {noteIdToEdit && subnoteToEdit && <SubnoteEditForm noteId={noteIdToEdit} subnoteId={subnoteToEdit} onSubnoteUpdated={handleSubnoteUpdated} />}
+            <button onClick={handleCloseSubnoteEditModal} className='default-button'>Sulje</button>
+          </Modal>
+
     </div>
   );
 }

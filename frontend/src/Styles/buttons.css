@@ -50,3 +50,16 @@
 .delete-button:hover {
     background-color: #e40808;
 }
+
+.edit-link-button {
+   border:0;
+    background-color:transparent;
+    color: #512685;
+    text-decoration: none;
+    cursor: pointer;
+}
+
+.edit-link-button:hover {
+    color: #502e77;
+    background-color: #e9e9ea;
+}

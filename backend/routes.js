@@ -78,6 +78,9 @@ router.get('/api/properties/:id/notes', (req, res) => {
     });
 });
 
+
+
+
 router.put('/api/notes/:id', (req, res) => {
   Note.findById(req.params.id)
     .then(note => {
@@ -111,6 +114,23 @@ router.delete('/api/notes/:id', (req, res) => {
 router.get('/api/notes/:id/subnotes', (req, res) => {
   Note.findById(req.params.id)
     .then(note => res.json(note.subnotes))
+    .catch(err => {
+      console.error(err);
+      res.status(400).json('Error: ' + err);
+    });
+});
+
+// Get a specific subnote of a note
+router.get('/api/notes/:noteId/subnotes/:subnoteId', (req, res) => {
+  Note.findById(req.params.noteId)
+    .then(note => {
+      const subnote = note.subnotes.id(req.params.subnoteId);
+      if (subnote) {
+        res.json(subnote);
+      } else {
+        res.status(404).json('Error: Subnote not found');
+      }
+    })
     .catch(err => {
       console.error(err);
       res.status(400).json('Error: ' + err);

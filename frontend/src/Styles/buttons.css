@@ -63,3 +63,16 @@
     color: #502e77;
     background-color: #e9e9ea;
 }
+
+.delete-link-button {
+    border:0;
+    background-color:transparent;
+    color: #f23e3e;
+    text-decoration: none;
+    cursor: pointer;
+}
+
+.delete-link-button:hover {
+    color: #e40808;
+    background-color: #e9e9ea;
+}

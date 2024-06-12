@@ -128,14 +128,16 @@ input {
     .subnote-table th {
         background-color: #512685;
         color: white;
-        padding: 8px;
+        padding: 4px;
         text-align: left;
     }
 
     .subnote-table td {
-        padding: 4px;
+        padding: 0.4% 0.2%;
+        
     }
 
     .subnote-table tr:nth-child(even) {
-        background-color: #f2f2f2;
+        background-color: #ebf9df;
     }
+

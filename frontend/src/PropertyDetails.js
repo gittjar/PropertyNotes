@@ -8,6 +8,8 @@ import SubnoteEditForm from './SubnoteEditForm';
 import './Styles/buttons.css';
 import './Styles/styles.css';
 import Modal from 'react-modal';
+import { FiEdit, FiTrash } from "react-icons/fi";
+
 
 Modal.setAppElement('#root');
 
@@ -22,6 +24,7 @@ function PropertyDetails(){
   const navigate = useNavigate();
   const [subnoteEditModalIsOpen, setSubnoteEditModalIsOpen] = useState(false);
   const [subnoteToEdit, setSubnoteToEdit] = useState(null);
+  const [subnoteToDelete, setSubnoteToDelete] = useState(null);
 
   
 
@@ -155,8 +158,43 @@ const handleOpenSubnoteEditModal = (noteId, subnoteId) => {
     setSubnoteEditModalIsOpen(false);
   };
 
+// Modify this function to just open the confirmation modal
+const handleSubnoteDelete = (noteId, subnoteId) => {
+  setNoteIdToEdit(noteId);
+  setSubnoteToDelete(subnoteId);
+  setConfirmModalIsOpen(true);
+};
 
+// Perform the deletion in this function
+const confirmSubnoteDelete = () => {
+  if (noteIdToEdit && subnoteToDelete) {
+    axios.delete(`${API_BASE_URL}/api/notes/${noteIdToEdit}/subnotes/${subnoteToDelete}`)
+      .then(() => {
+        // Fetch related notes
+        axios.get(`${API_BASE_URL}/api/properties/${id}/notes`)
+          .then(response => {
+            const fetchedNotes = response.data;
 
+            // Fetch subnotes for each note
+            const promises = fetchedNotes.map(note =>
+              axios.get(`${API_BASE_URL}/api/notes/${note._id}/subnotes`)
+            );
+
+            Promise.all(promises)
+              .then(subnoteResponses => {
+                const notesWithSubnotes = fetchedNotes.map((note, index) => ({
+                  ...note,
+                  subnotes: subnoteResponses[index].data
+                }));
+
+                setNotes(notesWithSubnotes);
+              });
+          });
+      });
+    setConfirmModalIsOpen(false);
+  }
+};
+    
   return (
     <div>
       <h2>{property.propertyName}</h2>
@@ -188,7 +226,7 @@ const handleOpenSubnoteEditModal = (noteId, subnoteId) => {
   <p className="note-info-row">Created at: {new Date(note.createdAt).toLocaleString()}</p>
   <p className="note-info-row">Last updated at: {new Date(note.updatedAt).toLocaleString()}</p>
   <p className="note-info-row">Status: {note.isTrue ? 'Completed' : 'Open'}</p>
-  <button onClick={() => openConfirmModal(note._id)} className='delete-button'>Delete Note</button>        
+  <button onClick={() => openConfirmModal(note._id)} className='delete-button'>Delete Note <FiTrash/></button>        
 </article>
     {/* Display subnotes */}
     <article className='subnotes'>
@@ -200,19 +238,24 @@ const handleOpenSubnoteEditModal = (noteId, subnoteId) => {
         <th>Created At</th>
         <th>Last Updated At</th>
         <th>Status</th>
+        <th>Actions</th>
       </tr>
     </thead>
     <tbody>
       {note.subnotes.map(subnote => (
         <tr key={subnote._id}>
-          <td>{subnote.content}</td>
+            <td className="truncate" title={subnote.content}>
+              {subnote.content.length > 20 ? `${subnote.content.substring(0, 20)}...` : subnote.content}
+            </td>          
           <td>{new Date(subnote.createdAt).toLocaleString()}</td>
-          <td>{new Date(subnote.updatedAt).toLocaleString()}</td>
+            <td>{new Date(subnote.updatedAt).toLocaleString()}</td>
+
           <td>{subnote.isTrue ? 'Completed' : 'Open'}</td>
           <td>
-          <button onClick={() => handleOpenSubnoteEditModal(note._id, subnote._id)} className='edit-link-button'>Edit</button>        
-          </td>
-          </tr>
+          <button onClick={() => handleOpenSubnoteEditModal(note._id, subnote._id)} className='edit-link-button'><FiEdit/></button>   
+          <button onClick={() => handleSubnoteDelete(note._id, subnote._id)} className='delete-link-button'><FiTrash/></button>          
+      </td>
+        </tr>
       ))}
     </tbody>
   </table>
@@ -244,6 +287,18 @@ const handleOpenSubnoteEditModal = (noteId, subnoteId) => {
           >
             {noteIdToEdit && subnoteToEdit && <SubnoteEditForm noteId={noteIdToEdit} subnoteId={subnoteToEdit} onSubnoteUpdated={handleSubnoteUpdated} />}
             <button onClick={handleCloseSubnoteEditModal} className='default-button'>Sulje</button>
+          </Modal>
+
+            <Modal
+            isOpen={confirmModalIsOpen}
+            onRequestClose={closeConfirmModal}
+            contentLabel="Confirm Deletion"
+            overlayClassName="ReactModal__Overlay"
+            className="ReactModal__Content"
+          >
+            <h2>Are you sure you want to delete this?</h2>
+            <button onClick={confirmSubnoteDelete} className='default-button'>Yes, delete</button>
+            <button onClick={closeConfirmModal} className='default-button'>No, don't delete</button>
           </Modal>
 
     </div>

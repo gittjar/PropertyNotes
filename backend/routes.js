@@ -176,15 +176,21 @@ router.put('/api/notes/:noteId/subnotes/:subnoteId', (req, res) => {
 
 // Delete a subnote of a note
 router.delete('/api/notes/:noteId/subnotes/:subnoteId', (req, res) => {
-  Note.findById(req.params.noteId)
+  const { noteId, subnoteId } = req.params;
+
+  Note.findById(noteId)
     .then(note => {
-      note.subnotes.id(req.params.subnoteId).remove();
+      const subnote = note.subnotes.id(subnoteId);
+      if (!subnote) {
+        return res.status(404).send('Subnote not found');
+      }
+      note.subnotes.pull(subnoteId); // Use the pull function to remove the subnote
       return note.save();
     })
-    .then(() => res.json('Subnote deleted!'))
+    .then(() => res.status(200).send('Subnote deleted'))
     .catch(err => {
-      console.error(err);
-      res.status(400).json('Error: ' + err);
+      console.error(err); // Log the error details
+      res.status(500).send(err);
     });
 });
 

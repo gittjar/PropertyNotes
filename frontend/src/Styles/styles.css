@@ -25,6 +25,7 @@ input {
     padding: 6px;
     border: 1px solid #512685;
     border-radius: 1px;
+    margin-bottom: 0.2rem;
 }
 
 .input-addnote {

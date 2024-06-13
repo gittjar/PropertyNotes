@@ -27,7 +27,7 @@ function NoteForm({ propertyId, onNoteAdded, propertyName }) {
 
   return (
     <form onSubmit={handleAddNote}>
-      <h3>Lisää tehtävä</h3>
+      <h3>Lisää tehtävä, muistiinpano tai tieto</h3>
       <p>{propertyName}</p>
       <textarea name="content" value={newNote.content} onChange={handleNoteChange} placeholder="Note content" className='input-addnote' />
       <input type="checkbox" name="isTrue" checked={newNote.isTrue} onChange={handleNoteChange} /> Tehty?

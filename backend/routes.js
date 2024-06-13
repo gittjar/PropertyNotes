@@ -31,6 +31,18 @@ router.get('/api/properties', (req, res) => {
     });
 });
 
+router.post('/api/properties/', (req, res) => {
+  const newProperty = new Property(req.body);
+
+  newProperty.save()
+    .then(() => res.json('Property added: ' + newProperty))
+    .catch(err => {
+      console.error(err);
+      res.status(400).json('Error: ' + err);
+    });
+}
+);
+
 router.get('/api/properties/:id', (req, res) => {
   Property.findById(req.params.id)
     .populate('notes')

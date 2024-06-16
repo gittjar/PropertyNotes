@@ -4,8 +4,6 @@ const Property = require('./models/property');
 const Note = require('./models/note');
 const { ObjectId } = require('mongodb');
 
-
-
 router.get('/', (req, res) => {
   res.send('Hello from the backend server!');
 });
@@ -107,17 +105,29 @@ router.put('/api/notes/:id', (req, res) => {
     });
 });
 
-router.delete('/api/notes/:id', (req, res) => {
+
+router.delete('/api/notes/:id', async (req, res) => {
   const noteId = req.params.id;
-  if (!ObjectId.isValid(noteId)) {
-    return res.status(400).send('Invalid note id');
+
+  try {
+    const note = await Note.findById(noteId);
+    if (!note) {
+      return res.status(404).send('Note not found');
+    }
+
+    console.log('Deleting note:', note);
+    // Delete all subnotes of the note
+    note.subnotes = [];
+    await note.save();
+
+    // Now delete the note itself
+    await Note.findByIdAndDelete(noteId);
+
+    res.status(200).send('Note and its subnotes deleted successfully');
+  } catch (err) {
+    console.error(err);
+    res.status(500).send('Internal Server Error');
   }
-  Note.findByIdAndDelete(req.params.id)
-    .then(() => res.json('Note deleted!'))
-    .catch(err => {
-      console.error(err);
-      res.status(400).json('Error: ' + err);
-    });
 });
 
 /*SUBNOTES*/

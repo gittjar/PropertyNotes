@@ -25,8 +25,7 @@ function PropertyDetails(){
   const [subnoteEditModalIsOpen, setSubnoteEditModalIsOpen] = useState(false);
   const [subnoteToEdit, setSubnoteToEdit] = useState(null);
   const [subnoteToDelete, setSubnoteToDelete] = useState(null);
-
-  
+  const [confirmSubnoteModalIsOpen, setConfirmSubnoteModalIsOpen] = useState(false);
 
   useEffect(() => {
 
@@ -162,7 +161,8 @@ const handleOpenSubnoteEditModal = (noteId, subnoteId) => {
 const handleSubnoteDelete = (noteId, subnoteId) => {
   setNoteIdToEdit(noteId);
   setSubnoteToDelete(subnoteId);
-  setConfirmModalIsOpen(true);
+  setConfirmSubnoteModalIsOpen(true); // Use the new state variable here
+
 };
 
 // Perform the deletion in this function
@@ -191,8 +191,8 @@ const confirmSubnoteDelete = () => {
               });
           });
       });
-    setConfirmModalIsOpen(false);
-  }
+      setConfirmSubnoteModalIsOpen(false); // Use the new state variable here
+    }
 };
     
   return (
@@ -273,9 +273,11 @@ const confirmSubnoteDelete = () => {
             overlayClassName="ReactModal__Overlay"
             className="ReactModal__Content"
           >
-            <h2>Poistetaanko tämä, oletko varma?</h2>
-            <button onClick={handleNoteDelete} className='default-button'>Kyllä, poista</button>
-            <button onClick={closeConfirmModal} className='default-button'>Ei, älä poista</button>
+            <h2>Poistetaanko tämä, oletko varma? </h2>
+            <p className='text-warning'>Tämä poistaa tietueen kaikki tiedot pysyvästi</p>
+           
+            <button onClick={handleNoteDelete} className='delete-button'>Poista</button>
+            <button onClick={closeConfirmModal} className='default-button'>Älä poista</button>
           </Modal>
 
           <Modal
@@ -289,17 +291,17 @@ const confirmSubnoteDelete = () => {
             <button onClick={handleCloseSubnoteEditModal} className='default-button'>Sulje</button>
           </Modal>
 
-            <Modal
-            isOpen={confirmModalIsOpen}
-            onRequestClose={closeConfirmModal}
-            contentLabel="Confirm Deletion"
-            overlayClassName="ReactModal__Overlay"
-            className="ReactModal__Content"
-          >
-            <h2>Are you sure you want to delete this?</h2>
-            <button onClick={confirmSubnoteDelete} className='default-button'>Yes, delete</button>
-            <button onClick={closeConfirmModal} className='default-button'>No, don't delete</button>
-          </Modal>
+          <Modal
+  isOpen={confirmSubnoteModalIsOpen}
+  onRequestClose={() => setConfirmSubnoteModalIsOpen(false)} 
+  contentLabel="Confirm Deletion"
+  overlayClassName="ReactModal__Overlay"
+  className="ReactModal__Content"
+>
+  <h2>Are you sure you want to delete this?</h2>
+  <button onClick={confirmSubnoteDelete} className='default-button'>Yes, delete</button>
+  <button onClick={() => setConfirmSubnoteModalIsOpen(false)} className='default-button'>No, don't delete</button>
+</Modal>
 
     </div>
   );

@@ -12,6 +12,10 @@ a:hover {
     color: #6a3e9e;
 }
 
+.text-warning {
+    color: #ff0000;
+}
+
 textarea {
     font-size: 0.8rem;
     padding: 6px;

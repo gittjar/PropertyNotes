@@ -43,6 +43,25 @@ input {
     height: 50%;
 }
 
+/* PROPERTY CARD */
+.property-card {
+  width: fit-content;
+  padding: 30px;
+  background-color: #fbfafa;
+  margin: 2px;
+  border: 1px solid #ddd;
+  border-radius: 10px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+.property-card h2 {
+  margin-top: 0;
+}
+
+.property-card p {
+  margin: 10px 0;
+}
+
 /* TABLE */
 
 .property-table {

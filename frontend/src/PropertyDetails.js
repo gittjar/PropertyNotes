@@ -26,6 +26,8 @@ function PropertyDetails(){
   const [subnoteToEdit, setSubnoteToEdit] = useState(null);
   const [subnoteToDelete, setSubnoteToDelete] = useState(null);
   const [confirmSubnoteModalIsOpen, setConfirmSubnoteModalIsOpen] = useState(false);
+  const [showPropertyDeleteModal, setShowPropertyDeleteModal] = useState(false);
+
 
   useEffect(() => {
 
@@ -194,18 +196,55 @@ const confirmSubnoteDelete = () => {
       setConfirmSubnoteModalIsOpen(false); // Use the new state variable here
     }
 };
+
+// Add this function inside the PropertyDetails component
+const handleDeletePropertyConfirmation = () => {
+  axios.delete(`${API_BASE_URL}/api/properties/${id}`)
+    .then(() => {
+      navigate(-1);
+    })
+    .catch(err => {
+      console.error(err);
+    });
+};
+
+const handlePropertyDeleteCancel = () => {
+  setShowPropertyDeleteModal(false);
+};
     
   return (
     <div>
-      <h2>{property.propertyName}</h2>
-      <p>{property.address}, {property.city}</p>
+     <article className="property-card">
+        <button onClick={() => setShowPropertyDeleteModal(true)} className='delete-link-button'> <FiTrash/> </button>      
 
-      <p>Total notes: {notes.length}</p>
-      <p>Completed notes: {notes.filter(note => note.isTrue).length}</p>
-      <p>Alert notes: {notes.filter(note => !note.isTrue).length}</p>
+        <h2>{property.propertyName}</h2>
+        <p>{property.address}, {property.city}</p>
 
-      <button onClick={handleBack} className='default-button'>Go Back</button>
-      <button onClick={handleOpenModal} className='default-button'>Add Note</button>
+        <p>Total notes: {notes.length}</p>
+        <p>Completed notes: {notes.filter(note => note.isTrue).length}</p>
+        <p>Alert notes: {notes.filter(note => !note.isTrue).length}</p>
+
+        <button onClick={handleBack} className='default-button'>Go Back</button>
+        <button onClick={handleOpenModal} className='default-button'>Add Note</button>
+      </article>
+
+      <Modal
+        isOpen={showPropertyDeleteModal}
+        onRequestClose={handlePropertyDeleteCancel}
+        contentLabel="Confirm Propert Deletion"
+        overlayClassName="ReactModal__Overlay"
+        className="ReactModal__Content"
+      >
+        <h2>Poista kohdetiedot kohteesta {property.propertyName} ?</h2>
+       
+        <p className='text-warning'>Tämä poistaa kaikki tiedot pysyvästi</p>
+        <button onClick={handleDeletePropertyConfirmation} className='delete-button'>Poista</button>
+        <button onClick={handlePropertyDeleteCancel} className='default-button'>Älä poista</button>
+      </Modal>
+
+      
+
+ 
 
       <Modal
         isOpen={modalIsOpen}

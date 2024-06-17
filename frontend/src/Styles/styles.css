@@ -43,6 +43,13 @@ input {
     height: 50%;
 }
 
+/* BUTTON GROUP */
+.note-button-group {
+    display: flex;
+    flex-direction: row;
+    margin: 0.1rem 0;
+}
+
 /* PROPERTY CARD */
 .property-card {
   width: fit-content;
@@ -74,6 +81,8 @@ input {
     color: white;
     padding: 8px;
     text-align: left;
+    border: 1px dashed #ddd;
+    font-size: 0.85rem;
 }
 
 .property-table td {

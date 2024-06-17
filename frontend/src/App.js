@@ -3,7 +3,7 @@ import axios from 'axios';
 import { Link } from 'react-router-dom';
 import NoteForm from './NoteForm';
 import { API_BASE_URL } from './config';
-import { BsArrowUpRight } from "react-icons/bs";
+import { BsArrowUpRight, BsArrowDownUp } from "react-icons/bs";
 import './Styles/styles.css';
 import Modal from 'react-modal';
 import PropertyForm from './PropertyForm';
@@ -91,8 +91,9 @@ function App() {
   <thead>
     <tr>
       <th>Property Name</th>
-      <th>Tehtäviä auki</th>
-      <th>Tehtäviä total</th>
+      <th>Tehtäviä kesken <BsArrowDownUp />
+    </th>
+      <th>Tehtäviä yhteensä</th>
       <th>Tehtäviä tehty</th>
       <th>Address</th>
       <th>City</th>

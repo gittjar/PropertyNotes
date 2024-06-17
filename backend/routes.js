@@ -92,10 +92,20 @@ router.get('/api/properties/:id/notes', (req, res) => {
 
 
 router.put('/api/notes/:id', (req, res) => {
+  console.log('Params:', req.params);
+  console.log('Body:', req.body);
+  
   Note.findById(req.params.id)
     .then(note => {
-      note.content = req.body.content;
-      note.isTrue = req.body.isTrue;
+      if (req.body.content !== undefined) {
+        note.content = req.body.content;
+      }
+      if (req.body.isTrue !== undefined) {
+        note.isTrue = req.body.isTrue;
+      }
+      if (req.body.alarmTime !== undefined) {
+        note.alarmTime = req.body.alarmTime;
+      }
       return note.save();
     })
     .then(() => res.json('Note updated!'))

@@ -43,8 +43,6 @@
     font-size: 12px;
     margin: 4px 2px;
     cursor: pointer;
-    width: fit-content;
-
 }
 
 .delete-button:hover {

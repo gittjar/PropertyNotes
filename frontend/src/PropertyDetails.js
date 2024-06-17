@@ -27,6 +27,10 @@ function PropertyDetails(){
   const [subnoteToDelete, setSubnoteToDelete] = useState(null);
   const [confirmSubnoteModalIsOpen, setConfirmSubnoteModalIsOpen] = useState(false);
   const [showPropertyDeleteModal, setShowPropertyDeleteModal] = useState(false);
+  const [alarmTime, setAlarmTime] = useState(new Date());
+  const [editingNoteId, setEditingNoteId] = useState(null); 
+  const [showAlarmTimeModal, setShowAlarmTimeModal] = useState(false);
+
 
 
   useEffect(() => {
@@ -211,6 +215,28 @@ const handleDeletePropertyConfirmation = () => {
 const handlePropertyDeleteCancel = () => {
   setShowPropertyDeleteModal(false);
 };
+
+const openAlarmTimeModal = (noteId) => {
+  setEditingNoteId(noteId);
+  setShowAlarmTimeModal(true);
+};
+
+
+
+const handleAlarmTimeConfirm = () => {
+  axios.put(`${API_BASE_URL}/api/notes/${editingNoteId}`, { alarmTime: alarmTime.toISOString() })
+    .then(() => {
+      setShowAlarmTimeModal(false);
+      // Fetch related notes
+      axios.get(`${API_BASE_URL}/api/properties/${id}/notes`)
+        .then(response => {
+          setNotes(response.data);
+        });
+    })
+    .catch(err => {
+      console.error(err);
+    });
+};
     
   return (
     <div>
@@ -264,8 +290,12 @@ const handlePropertyDeleteCancel = () => {
   <h4>{note.content}</h4>
   <p className="note-info-row">Created at: {new Date(note.createdAt).toLocaleString()}</p>
   <p className="note-info-row">Last updated at: {new Date(note.updatedAt).toLocaleString()}</p>
+  <p className="note-info-row">Alarm Time: {note.alarmTime ? new Date(note.alarmTime).toLocaleString() : 'Not set'}</p>
   <p className="note-info-row">Status: {note.isTrue ? 'Completed' : 'Open'}</p>
-  <button onClick={() => openConfirmModal(note._id)} className='delete-button'>Delete Note <FiTrash/></button>        
+  <article className='note-button-group'>
+  <button onClick={() => openAlarmTimeModal(note._id)} className='default-button'>Aseta hälytys</button>
+  <button onClick={() => openConfirmModal(note._id)} className='delete-button'>Poista tehtävä <FiTrash/></button> 
+  </article>      
 </article>
     {/* Display subnotes */}
     <article className='subnotes'>
@@ -340,6 +370,19 @@ const handlePropertyDeleteCancel = () => {
   <h2>Are you sure you want to delete this?</h2>
   <button onClick={confirmSubnoteDelete} className='default-button'>Yes, delete</button>
   <button onClick={() => setConfirmSubnoteModalIsOpen(false)} className='default-button'>No, don't delete</button>
+</Modal>
+
+<Modal
+  isOpen={showAlarmTimeModal}
+  onRequestClose={() => setShowAlarmTimeModal(false)}
+  contentLabel="Alarm Time"
+  overlayClassName="ReactModal__Overlay"
+  className="ReactModal__Content"
+>
+  <h2>Aseta hälytysaika</h2>
+  <input type="datetime-local" value={alarmTime.toISOString().substring(0, 16)} onChange={(e) => setAlarmTime(new Date(e.target.value))} />
+  <button onClick={handleAlarmTimeConfirm} className='default-button'>Vahvista</button>
+  <button onClick={() => setShowAlarmTimeModal(false)} className='default-button'>Cancel</button>
 </Modal>
 
     </div>

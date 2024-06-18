@@ -9,6 +9,7 @@ import './Styles/buttons.css';
 import './Styles/styles.css';
 import Modal from 'react-modal';
 import { FiEdit, FiTrash } from "react-icons/fi";
+import { FiAlertCircle } from "react-icons/fi";
 
 
 Modal.setAppElement('#root');
@@ -30,8 +31,6 @@ function PropertyDetails(){
   const [alarmTime, setAlarmTime] = useState(new Date());
   const [editingNoteId, setEditingNoteId] = useState(null); 
   const [showAlarmTimeModal, setShowAlarmTimeModal] = useState(false);
-
-
 
   useEffect(() => {
 
@@ -254,43 +253,28 @@ const handleAlarmTimeConfirm = () => {
         <button onClick={handleOpenModal} className='default-button'>Add Note</button>
       </article>
 
-      <Modal
-        isOpen={showPropertyDeleteModal}
-        onRequestClose={handlePropertyDeleteCancel}
-        contentLabel="Confirm Propert Deletion"
-        overlayClassName="ReactModal__Overlay"
-        className="ReactModal__Content"
-      >
-        <h2>Poista kohdetiedot kohteesta {property.propertyName} ?</h2>
-       
-        <p className='text-warning'>Tämä poistaa kaikki tiedot pysyvästi</p>
-        <button onClick={handleDeletePropertyConfirmation} className='delete-button'>Poista</button>
-        <button onClick={handlePropertyDeleteCancel} className='default-button'>Älä poista</button>
-      </Modal>
 
-      
 
- 
 
-      <Modal
-        isOpen={modalIsOpen}
-        onRequestClose={handleCloseModal}
-        contentLabel="Note Form"
-        overlayClassName="ReactModal__Overlay"
-        className="ReactModal__Content"
-      >
-        <NoteForm propertyId={id} onNoteAdded={handleNoteAdded} />
-        <button onClick={handleCloseModal} className='default-button'>Close Note</button>
-      </Modal>
 
       {/* Display notes */}
       {notes.map(note => (
         <div key={note.id} className='note-card'>
-<article className='note-info'>
-  <h4>{note.content}</h4>
+
+
+        <article className='note-info'>
+     
+        <h4>{note.content}       
+        </h4>
+
+
+
   <p className="note-info-row">Created at: {new Date(note.createdAt).toLocaleString()}</p>
   <p className="note-info-row">Last updated at: {new Date(note.updatedAt).toLocaleString()}</p>
-  <p className="note-info-row">Alarm Time: {note.alarmTime ? new Date(note.alarmTime).toLocaleString() : 'Not set'}</p>
+  <p className="note-info-row">
+  {note.alarmTime && new Date(note.alarmTime) < new Date() && (
+          <span className='text-warning'> <FiAlertCircle/> </span>)}
+    Alarm Time: {note.alarmTime ? new Date(note.alarmTime).toLocaleString() : 'Not set'}</p>
   <p className="note-info-row">Status: {note.isTrue ? 'Completed' : 'Open'}</p>
   <article className='note-button-group'>
   <button onClick={() => openAlarmTimeModal(note._id)} className='default-button'>Aseta hälytys</button>
@@ -384,6 +368,31 @@ const handleAlarmTimeConfirm = () => {
   <button onClick={handleAlarmTimeConfirm} className='default-button'>Vahvista</button>
   <button onClick={() => setShowAlarmTimeModal(false)} className='default-button'>Cancel</button>
 </Modal>
+
+<Modal
+        isOpen={showPropertyDeleteModal}
+        onRequestClose={handlePropertyDeleteCancel}
+        contentLabel="Confirm Propert Deletion"
+        overlayClassName="ReactModal__Overlay"
+        className="ReactModal__Content"
+      >
+        <h2>Poista kohdetiedot kohteesta {property.propertyName} ?</h2>
+       
+        <p className='text-warning'>Tämä poistaa kaikki tiedot pysyvästi</p>
+        <button onClick={handleDeletePropertyConfirmation} className='delete-button'>Poista</button>
+        <button onClick={handlePropertyDeleteCancel} className='default-button'>Älä poista</button>
+      </Modal>
+
+      <Modal
+        isOpen={modalIsOpen}
+        onRequestClose={handleCloseModal}
+        contentLabel="Note Form"
+        overlayClassName="ReactModal__Overlay"
+        className="ReactModal__Content"
+      >
+        <NoteForm propertyId={id} onNoteAdded={handleNoteAdded} />
+        <button onClick={handleCloseModal} className='default-button'>Close Note</button>
+      </Modal>
 
     </div>
   );

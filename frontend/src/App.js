@@ -3,7 +3,7 @@ import axios from 'axios';
 import { Link } from 'react-router-dom';
 import NoteForm from './NoteForm';
 import { API_BASE_URL } from './config';
-import { BsArrowUpRight, BsArrowDownUp } from "react-icons/bs";
+import { BsArrowUpRight, BsArrowDownUp, BsExclamationTriangleFill } from "react-icons/bs";
 import './Styles/styles.css';
 import Modal from 'react-modal';
 import PropertyForm from './PropertyForm';
@@ -16,6 +16,7 @@ function App() {
   const [propertyAdded, setPropertyAdded] = useState(false); 
   const [modalPropertyId, setModalPropertyId] = useState(null);
   const [isPropertyFormModalOpen, setIsPropertyFormModalOpen] = useState(false);
+  const [alarm, setAlarm] = useState(false);
 
 
   const handleOpenModal = (id) => {
@@ -37,6 +38,7 @@ function App() {
 
 
   useEffect(() => {
+    const currentDate = new Date();
     axios.get(`${API_BASE_URL}/api/properties`)
       .then(response => {
         const properties = response.data;
@@ -45,11 +47,24 @@ function App() {
         );
         Promise.all(promises)
           .then(noteResponses => {
-            const propertiesWithNotes = properties.map((property, index) => ({
-              ...property,
-              notes: noteResponses[index].data,
-              showNoteForm: false, 
-            }));
+            const propertiesWithNotes = properties.map((property, index) => {
+              const propertyWithNotes = {
+                ...property,
+                notes: noteResponses[index].data,
+                showNoteForm: false,
+                alarm: false, // Add alarm state to each property
+              };
+              // Check if any note's alarmTime is within one day from now
+              propertyWithNotes.notes.forEach(note => {
+                const alarmTime = new Date(note.alarmTime);
+                const timeDifference = Math.abs(alarmTime - currentDate);
+                const differenceInDays = timeDifference / (1000 * 3600 * 24);
+                if (differenceInDays <= 1) {
+                  propertyWithNotes.alarm = true;
+                }
+              });
+              return propertyWithNotes;
+            });
             setProperties(propertiesWithNotes);
         });
       });
@@ -106,6 +121,8 @@ function App() {
         <td>
           <Link to={`/properties/${property._id}`}>
             {property.propertyName} <BsArrowUpRight/>
+            {property.alarm && <span className="text-warning"> <BsExclamationTriangleFill /> </span>}
+
           </Link>
         </td>
         <td>{Array.isArray(property.notes) ? property.notes.filter(note => !note.isTrue).length : 0}</td>

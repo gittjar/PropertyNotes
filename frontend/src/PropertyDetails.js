@@ -275,7 +275,9 @@ const handleAlarmTimeConfirm = () => {
   {note.alarmTime && new Date(note.alarmTime) < new Date() && (
           <span className='text-warning'> <FiAlertCircle/> </span>)}
     Alarm Time: {note.alarmTime ? new Date(note.alarmTime).toLocaleString() : 'Not set'}</p>
-  <p className="note-info-row">Status: {note.isTrue ? 'Completed' : 'Open'}</p>
+
+    <p className="note-info-row">Status: {note.subnotes.every(subnote => subnote.isTrue) ? 'Completed' : 'Open'}</p>
+
   <article className='note-button-group'>
   <button onClick={() => openAlarmTimeModal(note._id)} className='default-button'>Aseta hälytys</button>
   <button onClick={() => openConfirmModal(note._id)} className='delete-button'>Poista tehtävä <FiTrash/></button> 

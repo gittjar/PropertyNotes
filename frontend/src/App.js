@@ -101,10 +101,10 @@ function App() {
         <thead>
           <tr>
             <th>Property Name</th>
-            <th>Huomiot</th>
-            <th>Tehtäviä kesken <BsArrowDownUp /></th>
-            <th>Tehtäviä yhteensä</th>
-            <th>Tehtäviä tehty</th>
+            <th>Warnings</th>
+            <th>Notes open <BsArrowDownUp /></th>
+            <th>Notes total</th>
+            <th>Notes done</th>
             <th>Address</th>
             <th>City</th>
             <th>Note</th>
@@ -134,34 +134,41 @@ function App() {
                 <button onClick={() => handleOpenModal(property._id)} className='add-button'>
                   Add Note / Todo
                 </button>
-                <Modal
-                  isOpen={modalPropertyId === property._id}
-                  onRequestClose={handleCloseModal}
-                  contentLabel="Note Form"
-                  overlayClassName="ReactModal__Overlay"
-                  className="ReactModal__Content"
-                >
-                  <NoteForm propertyId={property._id} propertyName={property.propertyName} onNoteAdded={(newNote) => handleNoteAdded(property._id, newNote)} />
-                  <button onClick={handleCloseModal} className='default-button'>Close Note</button>
-                </Modal>
-                <Modal
-                  isOpen={isPropertyFormModalOpen}
-                  onRequestClose={handleClosePropertyFormModal}
-                  contentLabel="Property Form"
-                  overlayClassName="ReactModal__Overlay"
-                  className="ReactModal__Content"
-                >
-                  <PropertyForm onPropertyAdded={(newProperty) => {
-                    handlePropertyAdded(newProperty);
-                    handleClosePropertyFormModal();
-                  }} />
-                  <button onClick={handleClosePropertyFormModal} className='default-button'>Close Form</button>
-                </Modal>
+
               </td>
             </tr>
           ))}
         </tbody>
       </table>
+
+      <Modal
+  isOpen={modalPropertyId !== null}
+  onRequestClose={handleCloseModal}
+  contentLabel="Note Form"
+  overlayClassName="ReactModal__Overlay"
+  className="ReactModal__Content"
+>
+  <NoteForm 
+    propertyId={modalPropertyId} 
+    propertyName={properties.find(property => property._id === modalPropertyId)?.propertyName} 
+    onNoteAdded={(newNote) => handleNoteAdded(modalPropertyId, newNote)} 
+  />
+  <button onClick={handleCloseModal} className='default-button'>Close Note</button>
+</Modal>
+                <Modal
+  isOpen={isPropertyFormModalOpen}
+  onRequestClose={handleClosePropertyFormModal}
+  contentLabel="Property Form"
+  overlayClassName="ReactModal__Overlay"
+  className="ReactModal__Content"
+>
+  <PropertyForm onPropertyAdded={(newProperty) => {
+    handlePropertyAdded(newProperty);
+    handleClosePropertyFormModal();
+  }} />
+  <button onClick={handleClosePropertyFormModal} className='default-button'>Close Form</button>
+</Modal>
+
     </div>
   );
 }

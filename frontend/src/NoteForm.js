@@ -30,8 +30,8 @@ function NoteForm({ propertyId, onNoteAdded, propertyName }) {
       <h3>Add todo, task or note</h3>
       <p>{propertyName}</p>
       <textarea name="content" value={newNote.content} onChange={handleNoteChange} placeholder="Note content" className='input-addnote' />
-      <input type="checkbox" name="isTrue" checked={newNote.isTrue} onChange={handleNoteChange} /> Done ?
-      <hr></hr>
+      <input type="checkbox" name="isTrue" defaultChecked={newNote.isTrue} onChange={handleNoteChange} /> Done ?
+            <hr></hr>
       <button type="submit" className='add-button'>Add Note</button>
     </form>
   );

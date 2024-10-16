@@ -246,11 +246,10 @@ const handleAlarmTimeConfirm = () => {
         <p>{property.address}, {property.city}</p>
 
         <p>Total notes: {notes.length}</p>
-        <p>Completed notes: {notes.filter(note => note.isTrue).length}</p>
-        <p>Alert notes: {notes.filter(note => !note.isTrue).length}</p>
-
+        <p>Completed notes: {notes.filter(note => note.subnotes.every(subnote => subnote.isTrue)).length}</p>
+        <p>Alert notes: {notes.filter(note => !note.subnotes.every(subnote => subnote.isTrue) && new Date(note.alarmTime) < new Date()).length}</p>
         <button onClick={handleBack} className='default-button'>Go Back</button>
-        <button onClick={handleOpenModal} className='default-button'>Add Note</button>
+        <button onClick={handleOpenModal} className='add-button'>Add Note</button>
       </article>
 
 
@@ -279,8 +278,8 @@ const handleAlarmTimeConfirm = () => {
     <p className="note-info-row">Status: {note.subnotes.every(subnote => subnote.isTrue) ? 'Completed' : 'Open'}</p>
 
   <article className='note-button-group'>
-  <button onClick={() => openAlarmTimeModal(note._id)} className='default-button'>Aseta hälytys</button>
-  <button onClick={() => openConfirmModal(note._id)} className='delete-button'>Poista tehtävä <FiTrash/></button> 
+  <button onClick={() => openAlarmTimeModal(note._id)} className='default-button'>Set alarm</button>
+  <button onClick={() => openConfirmModal(note._id)} className='delete-button'>Delete note <FiTrash/></button> 
   </article>      
 </article>
     {/* Display subnotes */}
@@ -378,11 +377,12 @@ const handleAlarmTimeConfirm = () => {
         overlayClassName="ReactModal__Overlay"
         className="ReactModal__Content"
       >
-        <h2>Poista kohdetiedot kohteesta {property.propertyName} ?</h2>
+        <h2>Delete {property.propertyName} and it's all information.</h2>
        
-        <p className='text-warning'>Tämä poistaa kaikki tiedot pysyvästi</p>
-        <button onClick={handleDeletePropertyConfirmation} className='delete-button'>Poista</button>
-        <button onClick={handlePropertyDeleteCancel} className='default-button'>Älä poista</button>
+        <p className='text-warning'>This will delete all information about {property.propertyName} permanently.</p>
+        <p>Are you sure you want to delete {property.propertyName}?</p>
+        <button onClick={handleDeletePropertyConfirmation} className='delete-button'>Delete {property.propertyName}</button>
+        <button onClick={handlePropertyDeleteCancel} className='default-button'>Cancel</button>
       </Modal>
 
       <Modal

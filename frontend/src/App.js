@@ -125,9 +125,9 @@ function App() {
               {property.alarm && <span className="text-warning"> <BsExclamationTriangleFill /> {property.pastAlarmsCount}
                   </span>} 
               </td>
-              <td>{Array.isArray(property.notes) ? property.notes.filter(note => !note.isTrue).length : 0}</td>
+              <td>{Array.isArray(property.notes) ? property.notes.length - property.notes.filter(note => note.subnotes && Array.isArray(note.subnotes) && note.subnotes.every(subnote => subnote.isTrue)).length : 0}</td>
               <td>{Array.isArray(property.notes) ? property.notes.length : 0}</td>
-              <td>{Array.isArray(property.notes) ? property.notes.filter(note => note.isTrue).length : 0}</td>
+              <td>{Array.isArray(property.notes) ? property.notes.filter(note => note.subnotes && Array.isArray(note.subnotes) && note.subnotes.every(subnote => subnote.isTrue)).length : 0}</td>
               <td>{property.address}</td>
               <td>{property.city}</td>
               <td>

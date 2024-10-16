@@ -32,25 +32,25 @@ function SubnoteEditForm({ noteId, subnoteId, onSubnoteUpdated }) {
 
     const handleUpdateSubnote = (event) => {
         event.preventDefault();
-      
+    
         // Check if noteId and subnoteId are defined and valid
         if (!noteId || !subnoteId || noteId.length !== 24 || subnoteId.length !== 24) {
-          console.error('Invalid noteId:', noteId, 'or subnoteId:', subnoteId);
-          return;
+            console.error('Invalid noteId:', noteId, 'or subnoteId:', subnoteId);
+            return;
         }
-      
+    
         // Convert isTrue to boolean
         const updatedData = {
-          ...updatedSubnote,
-          isTrue: updatedSubnote.isTrue === 'true' || updatedSubnote.isTrue === true,
+            ...updatedSubnote,
+            isTrue: updatedSubnote.isTrue === 'true' || updatedSubnote.isTrue === true,
         };
-      
+    
         axios.put(`${API_BASE_URL}/api/notes/${noteId}/subnotes/${subnoteId}`, updatedData)
-          .then(response => {
-            console.log(response.data);
-            onSubnoteUpdated(response.data);
-          });
-      };
+            .then(response => {
+                console.log(response.data);
+                onSubnoteUpdated(noteId, subnoteId, updatedData.isTrue);
+            });
+    };
 
     return (
         <form onSubmit={handleUpdateSubnote}>

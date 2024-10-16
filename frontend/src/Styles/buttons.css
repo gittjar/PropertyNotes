@@ -2,7 +2,7 @@
     background-color: #512685;
     color: white;
     border: none;
-    border-radius: 0.45rem;
+    border-radius: 0.15rem;
     padding: 8px 16px;
     text-align: center;
     text-decoration: none;
@@ -20,7 +20,7 @@
     background-color: #72de0e;
     color: black;
     border: 1px solid #72de0e;
-    border-radius: 0.45rem;
+    border-radius: 0.15rem;
     padding: 8px 16px;
     text-align: center;
     text-decoration: none;
@@ -38,7 +38,7 @@
     background-color: #f23e3e;
     color: white;
     border: none;
-    border-radius: 0.3rem;
+    border-radius: 0.15rem;
     padding: 8px 16px;
     text-align: center;
     text-decoration: none;

@@ -124,31 +124,36 @@ function PropertyDetails(){
       });
   };
 
-  const handleSubnoteUpdated = () => {
+  const handleSubnoteUpdated = (noteId, subnoteId, isTrue) => {
+    // Update the state of the notes and subnotes
+    setNotes(prevNotes => prevNotes.map(note => 
+      note._id === noteId ? {...note, subnotes: note.subnotes.map(subnote => 
+        subnote._id === subnoteId ? {...subnote, isTrue} : subnote)} : note));
+  
     // Fetch related notes
     axios.get(`${API_BASE_URL}/api/properties/${id}/notes`)
       .then(response => {
         const fetchedNotes = response.data;
-
+  
         // Fetch subnotes for each note
         const promises = fetchedNotes.map(note =>
           axios.get(`${API_BASE_URL}/api/notes/${note._id}/subnotes`)
         );
-
+  
         Promise.all(promises)
           .then(subnoteResponses => {
             const notesWithSubnotes = fetchedNotes.map((note, index) => ({
               ...note,
               subnotes: subnoteResponses[index].data
             }));
-
+  
             setNotes(notesWithSubnotes);
           });
       });
-
+  
     // Close the subnote edit modal
     handleCloseSubnoteEditModal();
-};
+  };
 
 
 const handleOpenSubnoteEditModal = (noteId, subnoteId) => {
@@ -245,9 +250,34 @@ const handleAlarmTimeConfirm = () => {
         <h2>{property.propertyName}</h2>
         <p>{property.address}, {property.city}</p>
 
-        <p>Total notes: {notes.length}</p>
-        <p>Completed notes: {notes.filter(note => note.subnotes.every(subnote => subnote.isTrue)).length}</p>
-        <p>Alert notes: {notes.filter(note => !note.subnotes.every(subnote => subnote.isTrue) && new Date(note.alarmTime) < new Date()).length}</p>
+        <table className='subnote-table'>
+  <thead>
+    <tr>
+      <th>Note Status</th>
+      <th>Count</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>Total notes</td>
+      <td>{notes.length}</td>
+    </tr>
+    <tr>
+      <td>Open notes</td>
+      <td>{notes.filter(note => note.subnotes.length === 0 || !note.subnotes.every(subnote => subnote.isTrue)).length}</td>
+    </tr>
+    <tr>
+      <td>Completed notes</td>
+      <td>
+        {notes.filter(note => note.subnotes.length === 0 || note.subnotes.every(subnote => subnote.isTrue)).length}      
+      </td>
+          </tr>
+    <tr>
+      <td>Alert notes</td>
+      <td>{notes.filter(note => (note.subnotes.length === 0 || !note.subnotes.every(subnote => subnote.isTrue)) && new Date(note.alarmTime) < new Date()).length}</td>
+    </tr>
+  </tbody>
+</table>
         <button onClick={handleBack} className='default-button'>Go Back</button>
         <button onClick={handleOpenModal} className='add-button'>Add Note</button>
       </article>
@@ -275,9 +305,16 @@ const handleAlarmTimeConfirm = () => {
           <span className='text-warning'> <FiAlertCircle/> </span>)}
     Alarm Time: {note.alarmTime ? new Date(note.alarmTime).toLocaleString() : 'Not set'}</p>
 
-    <p className="note-info-row">Status: {note.subnotes.every(subnote => subnote.isTrue) ? 'Completed' : 'Open'}</p>
+    <p className="note-info-row">
+  Status: 
+  {note.subnotes.length === 0 
+    ? (note.isTrue ? 'Completed' : 'Open') 
+    : (note.subnotes.every(subnote => subnote.isTrue) ? 'Completed' : 'Open')
+  }
+</p>
+    <p className="note-info-row">Subnotes: {note.subnotes.length}</p>
 
-  <article className='note-button-group'>
+      <article className='note-button-group'>
   <button onClick={() => openAlarmTimeModal(note._id)} className='default-button'>Set alarm</button>
   <button onClick={() => openConfirmModal(note._id)} className='delete-button'>Delete note <FiTrash/></button> 
   </article>      
@@ -327,11 +364,11 @@ const handleAlarmTimeConfirm = () => {
             overlayClassName="ReactModal__Overlay"
             className="ReactModal__Content"
           >
-            <h2>Poistetaanko tämä, oletko varma? </h2>
-            <p className='text-warning'>Tämä poistaa tietueen kaikki tiedot pysyvästi</p>
+            <h2>Delete this, are you sure? </h2>
+            <p className='text-warning'>This will delete all information about this note permanently.</p>
            
-            <button onClick={handleNoteDelete} className='delete-button'>Poista</button>
-            <button onClick={closeConfirmModal} className='default-button'>Älä poista</button>
+            <button onClick={handleNoteDelete} className='delete-button'>Delete</button>
+            <button onClick={closeConfirmModal} className='default-button'>Cancel</button>
           </Modal>
 
           <Modal
@@ -342,7 +379,7 @@ const handleAlarmTimeConfirm = () => {
             className="ReactModal__Content"
           >
             {noteIdToEdit && subnoteToEdit && <SubnoteEditForm noteId={noteIdToEdit} subnoteId={subnoteToEdit} onSubnoteUpdated={handleSubnoteUpdated} />}
-            <button onClick={handleCloseSubnoteEditModal} className='default-button'>Sulje</button>
+            <button onClick={handleCloseSubnoteEditModal} className='default-button'>Close</button>
           </Modal>
 
           <Modal
@@ -364,9 +401,9 @@ const handleAlarmTimeConfirm = () => {
   overlayClassName="ReactModal__Overlay"
   className="ReactModal__Content"
 >
-  <h2>Aseta hälytysaika</h2>
+  <h2>Set alarm time</h2>
   <input type="datetime-local" value={alarmTime.toISOString().substring(0, 16)} onChange={(e) => setAlarmTime(new Date(e.target.value))} />
-  <button onClick={handleAlarmTimeConfirm} className='default-button'>Vahvista</button>
+  <button onClick={handleAlarmTimeConfirm} className='default-button'>Confirm</button>
   <button onClick={() => setShowAlarmTimeModal(false)} className='default-button'>Cancel</button>
 </Modal>
 

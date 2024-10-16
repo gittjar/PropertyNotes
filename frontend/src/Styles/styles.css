@@ -52,13 +52,13 @@ input {
 
 /* PROPERTY CARD */
 .property-card {
-  width: fit-content;
+  width: 15rem;
   padding: 30px;
   background-color: #fbfafa;
-  margin: 2px;
+  margin: 0.2rem;
   border: 1px solid #ddd;
   border-radius: 10px;
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
 }
 
 .property-card h2 {
@@ -77,7 +77,7 @@ input {
 }
 
 .property-table th {
-    background-color: #512685;
+    background-color: #2a009d;
     color: white;
     padding: 8px;
     text-align: left;
@@ -142,7 +142,7 @@ input {
   }
 
   .subnotes {
-    width: 70%;
+    width: 65%;
     background-color: #f2f2f2;
     border: 1px solid #512685;
     border-radius: 2px;
@@ -159,8 +159,10 @@ input {
   }
 
     .subnote-table th {
-        background-color: #512685;
+        background-color: #4f00af;
         color: white;
+        border: 1px dashed #ddd;
+
         padding: 4px;
         text-align: left;
     }

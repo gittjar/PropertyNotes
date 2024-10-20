@@ -34,12 +34,12 @@ function PropertyForm({ onPropertyAdded }) {
   return (
     <form onSubmit={handleSubmit}>
       
-        <h3>Lisää uusi kohde</h3>
-        <input type="text" value={propertyName} onChange={e => setPropertyName(e.target.value)} placeholder='Kohteen nimi' />
+        <h3>Create new property</h3>
+        <input type="text" value={propertyName} onChange={e => setPropertyName(e.target.value)} placeholder='Property name' />
         <br></br>
-        <input type="text" value={address} onChange={e => setAddress(e.target.value)} placeholder='Osoite' />
+        <input type="text" value={address} onChange={e => setAddress(e.target.value)} placeholder='Street address' />
         <br></br>
-        <input type="text" value={city} onChange={e => setCity(e.target.value)} placeholder='Kaupunki' />
+        <input type="text" value={city} onChange={e => setCity(e.target.value)} placeholder='City' />
       <br></br>
       <button type="submit" className='add-button'>Add Property</button>
     </form>

@@ -262,6 +262,7 @@ const handleInput = (e) => {
 
   return (
     <div>
+      <section className='property-details-main'>
       <article className="property-card">
         <button onClick={() => setShowPropertyDeleteModal(true)} className='delete-link-button'> <FiTrash/> </button>      
 
@@ -443,6 +444,7 @@ const handleInput = (e) => {
         <NoteForm propertyId={property.id} onNoteAdded={handleNoteAdded} />
         <button onClick={handleCloseModal} className='default-button'>Close Note</button>
       </Modal>
+      </section>
     </div>
   );
 }

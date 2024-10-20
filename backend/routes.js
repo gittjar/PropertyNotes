@@ -63,11 +63,18 @@ router.delete('/api/properties/:id', (req, res) => {
 
 
 router.post('/api/properties/:id/notes', (req, res) => {
+  const propertyId = req.params.id;
   const alarmDays = req.body.alarmDays || 7; // Default to 7 if not provided
+
+  // Validate that 'propertyId' is a valid ObjectId
+  if (!mongoose.Types.ObjectId.isValid(propertyId)) {
+    return res.status(400).json({ error: 'Invalid property ID' });
+  }
+
   const newNote = new Note({
     content: req.body.content,
     isTrue: req.body.isTrue,
-    property: req.params.id,
+    property: propertyId,
     alarmTime: new Date(Date.now() + alarmDays * 24 * 60 * 60 * 1000) // Current time + alarmDays days
   });
 

@@ -95,7 +95,9 @@ function App() {
   };
 
   return (
-    <div>
+    <div >
+      <section className='property-main'>
+      <h2>Property Notes App</h2>
       <button onClick={handleOpenPropertyFormModal} className='add-button'>Add property</button>
       <table className='property-table'>
         <thead>
@@ -168,7 +170,7 @@ function App() {
   }} />
   <button onClick={handleClosePropertyFormModal} className='default-button'>Close Form</button>
 </Modal>
-
+</section>
     </div>
   );
 }

@@ -65,11 +65,9 @@ function App() {
             setProperties(propertiesWithNotes);
         });
       });
-    setPropertyAdded(false); 
-  }, [propertyAdded]); 
+    setPropertyAdded(false); // Reset the flag after fetching properties
+  }, [propertyAdded]); // Re-fetch properties when propertyAdded changes
   
-  
-
   const handleNoteAdded = (propertyId, newNote) => {
     setProperties(prevProperties => {
       return prevProperties.map(property => {
@@ -87,7 +85,7 @@ function App() {
   };
 
   const handlePropertyAdded = (newProperty) => {
-    setPropertyAdded(true);
+    setPropertyAdded(true); // Trigger useEffect to re-fetch properties
     setProperties(prevProperties => [
       ...prevProperties, 
       { ...newProperty, notes: [] }
@@ -95,82 +93,78 @@ function App() {
   };
 
   return (
-    <div >
+    <div>
       <section className='property-main'>
-      <h2>Property Notes App</h2>
-      <button onClick={handleOpenPropertyFormModal} className='add-button'>Add property</button>
-      <table className='property-table'>
-        <thead>
-          <tr>
-            <th>Property Name</th>
-            <th>Warnings</th>
-            <th>Notes open <BsArrowDownUp /></th>
-            <th>Notes total</th>
-            <th>Notes done</th>
-            <th>Address</th>
-            <th>City</th>
-            <th>Note</th>
-
-          </tr>
-        </thead>
-        <tbody>
-          {properties.map(property => (
-            <tr key={property._id}>
-              <td>
-                <Link to={`/properties/${property._id}`}>
-                  {property.propertyName} <BsArrowUpRight/>
-               
-
-                </Link>
-              </td>
-              <td>
-              {property.alarm && <span className="text-warning"> <BsExclamationTriangleFill /> {property.pastAlarmsCount}
-                  </span>} 
-              </td>
-              <td>{Array.isArray(property.notes) ? property.notes.length - property.notes.filter(note => note.subnotes && Array.isArray(note.subnotes) && note.subnotes.every(subnote => subnote.isTrue)).length : 0}</td>
-              <td>{Array.isArray(property.notes) ? property.notes.length : 0}</td>
-              <td>{Array.isArray(property.notes) ? property.notes.filter(note => note.subnotes && Array.isArray(note.subnotes) && note.subnotes.every(subnote => subnote.isTrue)).length : 0}</td>
-              <td>{property.address}</td>
-              <td>{property.city}</td>
-              <td>
-                <button onClick={() => handleOpenModal(property._id)} className='add-button'>
-                  Add Note / Todo
-                </button>
-
-              </td>
+        <h2>Property Notes App</h2>
+        <button onClick={handleOpenPropertyFormModal} className='add-button'>Add property</button>
+        <table className='property-table'>
+          <thead>
+            <tr>
+              <th>Property Name</th>
+              <th>Warnings</th>
+              <th>Notes open <BsArrowDownUp /></th>
+              <th>Notes total</th>
+              <th>Notes done</th>
+              <th>Address</th>
+              <th>City</th>
+              <th>Note</th>
             </tr>
-          ))}
-        </tbody>
-      </table>
+          </thead>
+          <tbody>
+            {properties.map(property => (
+              <tr key={property._id}>
+                <td>
+                  <Link to={`/properties/${property._id}`}>
+                    {property.propertyName} <BsArrowUpRight/>
+                  </Link>
+                </td>
+                <td>
+                  {property.alarm && <span className="text-warning"> <BsExclamationTriangleFill /> {property.pastAlarmsCount}</span>} 
+                </td>
+                <td>{Array.isArray(property.notes) ? property.notes.length - property.notes.filter(note => note.subnotes && Array.isArray(note.subnotes) && note.subnotes.every(subnote => subnote.isTrue)).length : 0}</td>
+                <td>{Array.isArray(property.notes) ? property.notes.length : 0}</td>
+                <td>{Array.isArray(property.notes) ? property.notes.filter(note => note.subnotes && Array.isArray(note.subnotes) && note.subnotes.every(subnote => subnote.isTrue)).length : 0}</td>
+                <td>{property.address}</td>
+                <td>{property.city}</td>
+                <td>
+                  <button onClick={() => handleOpenModal(property._id)} className='add-button'>
+                    Add Note / Todo
+                  </button>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
 
-      <Modal
-  isOpen={modalPropertyId !== null}
-  onRequestClose={handleCloseModal}
-  contentLabel="Note Form"
-  overlayClassName="ReactModal__Overlay"
-  className="ReactModal__Content"
->
-  <NoteForm 
-    propertyId={modalPropertyId} 
-    propertyName={properties.find(property => property._id === modalPropertyId)?.propertyName} 
-    onNoteAdded={(newNote) => handleNoteAdded(modalPropertyId, newNote)} 
-  />
-  <button onClick={handleCloseModal} className='default-button'>Close Note</button>
-</Modal>
-                <Modal
-  isOpen={isPropertyFormModalOpen}
-  onRequestClose={handleClosePropertyFormModal}
-  contentLabel="Property Form"
-  overlayClassName="ReactModal__Overlay"
-  className="ReactModal__Content"
->
-  <PropertyForm onPropertyAdded={(newProperty) => {
-    handlePropertyAdded(newProperty);
-    handleClosePropertyFormModal();
-  }} />
-  <button onClick={handleClosePropertyFormModal} className='default-button'>Close Form</button>
-</Modal>
-</section>
+        <Modal
+          isOpen={modalPropertyId !== null}
+          onRequestClose={handleCloseModal}
+          contentLabel="Note Form"
+          overlayClassName="ReactModal__Overlay"
+          className="ReactModal__Content"
+        >
+          <NoteForm 
+            propertyId={modalPropertyId} 
+            propertyName={properties.find(property => property._id === modalPropertyId)?.propertyName} 
+            onNoteAdded={(newNote) => handleNoteAdded(modalPropertyId, newNote)} 
+          />
+          <button onClick={handleCloseModal} className='default-button'>Close Note</button>
+        </Modal>
+
+        <Modal
+          isOpen={isPropertyFormModalOpen}
+          onRequestClose={handleClosePropertyFormModal}
+          contentLabel="Property Form"
+          overlayClassName="ReactModal__Overlay"
+          className="ReactModal__Content"
+        >
+          <PropertyForm onPropertyAdded={(newProperty) => {
+            handlePropertyAdded(newProperty);
+            handleClosePropertyFormModal();
+          }} />
+          <button onClick={handleClosePropertyFormModal} className='default-button'>Close Form</button>
+        </Modal>
+      </section>
     </div>
   );
 }

@@ -17,11 +17,20 @@ function NoteForm({ propertyId, onNoteAdded, propertyName }) {
 
   const handleAddNote = (event) => {
     event.preventDefault();
+    
+    if (!propertyId) {
+      console.error('Property ID is missing');
+      return;
+    }
+
     axios.post(`${API_BASE_URL}/api/properties/${propertyId}/notes`, newNote)
       .then(response => {
         console.log(response.data);
         onNoteAdded(response.data);
         setNewNote({ content: '', isTrue: false });
+      })
+      .catch(error => {
+        console.error('Error adding note:', error);
       });
   };
 
@@ -29,9 +38,20 @@ function NoteForm({ propertyId, onNoteAdded, propertyName }) {
     <form onSubmit={handleAddNote}>
       <h3>Add todo, task or note</h3>
       <p>{propertyName}</p>
-      <textarea name="content" value={newNote.content} onChange={handleNoteChange} placeholder="Note content" className='input-addnote' />
-      <input type="checkbox" name="isTrue" checked={newNote.isTrue} onChange={handleNoteChange} /> Done ?
-            <hr></hr>
+      <textarea 
+        name="content" 
+        value={newNote.content} 
+        onChange={handleNoteChange} 
+        placeholder="Note content" 
+        className='input-addnote' 
+      />
+      <input 
+        type="checkbox" 
+        name="isTrue" 
+        checked={newNote.isTrue} 
+        onChange={handleNoteChange} 
+      /> Done ?
+      <hr />
       <button type="submit" className='add-button'>Add Note</button>
     </form>
   );

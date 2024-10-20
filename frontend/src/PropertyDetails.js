@@ -28,8 +28,8 @@ function PropertyDetails(){
   const [subnoteToDelete, setSubnoteToDelete] = useState(null);
   const [confirmSubnoteModalIsOpen, setConfirmSubnoteModalIsOpen] = useState(false);
   const [showPropertyDeleteModal, setShowPropertyDeleteModal] = useState(false);
-  const [alarmTime, setAlarmTime] = useState(new Date());
   const [editingNoteId, setEditingNoteId] = useState(null); 
+  const [alarmTime, setAlarmTime] = useState(new Date());
   const [showAlarmTimeModal, setShowAlarmTimeModal] = useState(false);
 
   useEffect(() => {
@@ -241,181 +241,192 @@ const handleAlarmTimeConfirm = () => {
       console.error(err);
     });
 };
-    
+
+const isValidDate = (dateString) => {
+  const date = new Date(dateString);
+  return date instanceof Date && !isNaN(date);
+};
+
+
+const handleFocus = (e) => {
+  e.target.readOnly = false;
+};
+
+const handleBlur = (e) => {
+  e.target.readOnly = true;
+};
+
+const handleInput = (e) => {
+  e.target.value = alarmTime.toISOString().substring(0, 16);
+};
+
   return (
     <div>
-     <article className="property-card">
+      <article className="property-card">
         <button onClick={() => setShowPropertyDeleteModal(true)} className='delete-link-button'> <FiTrash/> </button>      
 
         <h2>{property.propertyName}</h2>
         <p>{property.address}, {property.city}</p>
 
         <table className='subnote-table'>
-  <thead>
-    <tr>
-      <th>Note Status</th>
-      <th>Count</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <td>Total notes</td>
-      <td>{notes.length}</td>
-    </tr>
-    <tr>
-      <td>Open notes</td>
-      <td>{notes.filter(note => note.subnotes.length === 0 || !note.subnotes.every(subnote => subnote.isTrue)).length}</td>
-    </tr>
-    <tr>
-      <td>Completed notes</td>
-      <td>
-        {notes.filter(note => note.subnotes.length === 0 || note.subnotes.every(subnote => subnote.isTrue)).length}      
-      </td>
-          </tr>
-    <tr>
-      <td>Alert notes</td>
-      <td>{notes.filter(note => (note.subnotes.length === 0 || !note.subnotes.every(subnote => subnote.isTrue)) && new Date(note.alarmTime) < new Date()).length}</td>
-    </tr>
-  </tbody>
-</table>
+          <thead>
+            <tr>
+              <th>Note Status</th>
+              <th>Count</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Total notes</td>
+              <td>{notes.length}</td>
+            </tr>
+            <tr>
+              <td>Open notes</td>
+              <td>{notes.filter(note => note.subnotes.length === 0 || !note.subnotes.every(subnote => subnote.isTrue)).length}</td>
+            </tr>
+            <tr>
+              <td>Completed notes</td>
+              <td>{notes.filter(note => note.subnotes.length === 0 || note.subnotes.every(subnote => subnote.isTrue)).length}</td>
+            </tr>
+            <tr>
+              <td>Alert notes</td>
+              <td>{notes.filter(note => (note.subnotes.length === 0 || !note.subnotes.every(subnote => subnote.isTrue)) && isValidDate(note.alarmTime) && new Date(note.alarmTime) < new Date()).length}</td>
+            </tr>
+          </tbody>
+        </table>
         <button onClick={handleBack} className='default-button'>Go Back</button>
         <button onClick={handleOpenModal} className='add-button'>Add Note</button>
       </article>
 
-
-
-
-
       {/* Display notes */}
       {notes.map(note => (
         <div key={note.id} className='note-card'>
+          <article className='note-info'>
+            <h4>{note.content}</h4>
+            <p className="note-info-row">Created at: {new Date(note.createdAt).toLocaleString()}</p>
+            <p className="note-info-row">Last updated at: {new Date(note.updatedAt).toLocaleString()}</p>
+            <p className="note-info-row">
+              {note.alarmTime && isValidDate(note.alarmTime) && new Date(note.alarmTime) < new Date() && (
+                <span className='text-warning'> <FiAlertCircle/> </span>
+              )}
+              Alarm Time: {note.alarmTime ? new Date(note.alarmTime).toLocaleString() : 'Not set'}
+            </p>
+            <p className="note-info-row">
+              Status: 
+              {note.subnotes.length === 0 
+                ? (note.isTrue ? 'Completed' : 'Open') 
+                : (note.subnotes.every(subnote => subnote.isTrue) ? 'Completed' : 'Open')
+              }
+            </p>
+            <p className="note-info-row">Subnotes: {note.subnotes.length}</p>
+            <article className='note-button-group'>
+              <button onClick={() => openAlarmTimeModal(note._id)} className='default-button'>Set alarm</button>
+              <button onClick={() => openConfirmModal(note._id)} className='delete-button'>Delete note <FiTrash/></button> 
+            </article>      
+          </article>
 
+          {/* Display subnotes */}
+          <article className='subnotes'>
+            <h4>Subnotes</h4>
+            <table className='subnote-table'>
+              <thead>
+                <tr>
+                  <th>Content</th>
+                  <th>Created At</th>
+                  <th>Last Updated At</th>
+                  <th>Status</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                {note.subnotes.map(subnote => (
+                  <tr key={subnote._id}>
+                    <td className="truncate" title={subnote.content}>
+                      {subnote.content.length > 20 ? `${subnote.content.substring(0, 20)}...` : subnote.content}
+                    </td>          
+                    <td>{new Date(subnote.createdAt).toLocaleString()}</td>
+                    <td>{new Date(subnote.updatedAt).toLocaleString()}</td>
+                    <td>{subnote.isTrue ? 'Completed' : 'Open'}</td>
+                    <td>
+                      <button onClick={() => handleOpenSubnoteEditModal(note._id, subnote._id)} className='edit-link-button'><FiEdit/></button>   
+                      <button onClick={() => handleSubnoteDelete(note._id, subnote._id)} className='delete-link-button'><FiTrash/></button>          
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </article>
 
-        <article className='note-info'>
-     
-        <h4>{note.content}       
-        </h4>
-
-
-
-  <p className="note-info-row">Created at: {new Date(note.createdAt).toLocaleString()}</p>
-  <p className="note-info-row">Last updated at: {new Date(note.updatedAt).toLocaleString()}</p>
-  <p className="note-info-row">
-  {note.alarmTime && new Date(note.alarmTime) < new Date() && (
-          <span className='text-warning'> <FiAlertCircle/> </span>)}
-    Alarm Time: {note.alarmTime ? new Date(note.alarmTime).toLocaleString() : 'Not set'}</p>
-
-    <p className="note-info-row">
-  Status: 
-  {note.subnotes.length === 0 
-    ? (note.isTrue ? 'Completed' : 'Open') 
-    : (note.subnotes.every(subnote => subnote.isTrue) ? 'Completed' : 'Open')
-  }
-</p>
-    <p className="note-info-row">Subnotes: {note.subnotes.length}</p>
-
-      <article className='note-button-group'>
-  <button onClick={() => openAlarmTimeModal(note._id)} className='default-button'>Set alarm</button>
-  <button onClick={() => openConfirmModal(note._id)} className='delete-button'>Delete note <FiTrash/></button> 
-  </article>      
-</article>
-    {/* Display subnotes */}
-    <article className='subnotes'>
-  <h4>Subnotes</h4>
-  <table className='subnote-table'>
-    <thead>
-      <tr>
-        <th>Content</th>
-        <th>Created At</th>
-        <th>Last Updated At</th>
-        <th>Status</th>
-        <th>Actions</th>
-      </tr>
-    </thead>
-    <tbody>
-      {note.subnotes.map(subnote => (
-        <tr key={subnote._id}>
-            <td className="truncate" title={subnote.content}>
-              {subnote.content.length > 20 ? `${subnote.content.substring(0, 20)}...` : subnote.content}
-            </td>          
-          <td>{new Date(subnote.createdAt).toLocaleString()}</td>
-            <td>{new Date(subnote.updatedAt).toLocaleString()}</td>
-
-          <td>{subnote.isTrue ? 'Completed' : 'Open'}</td>
-          <td>
-          <button onClick={() => handleOpenSubnoteEditModal(note._id, subnote._id)} className='edit-link-button'><FiEdit/></button>   
-          <button onClick={() => handleSubnoteDelete(note._id, subnote._id)} className='delete-link-button'><FiTrash/></button>          
-      </td>
-        </tr>
-      ))}
-    </tbody>
-  </table>
-</article>
-
-         {/* Add SubnoteForm for each note */}
-         <SubnoteForm noteId={note._id} onSubnoteAdded={handleSubnoteAdded} />       
-          </div>
+          {/* Add SubnoteForm for each note */}
+          <SubnoteForm noteId={note._id} onSubnoteAdded={handleSubnoteAdded} />       
+        </div>
       ))}
 
-          <Modal
-            isOpen={confirmModalIsOpen}
-            onRequestClose={closeConfirmModal}
-            contentLabel="Confirm Deletion"
-            overlayClassName="ReactModal__Overlay"
-            className="ReactModal__Content"
-          >
-            <h2>Delete this, are you sure? </h2>
-            <p className='text-warning'>This will delete all information about this note permanently.</p>
-           
-            <button onClick={handleNoteDelete} className='delete-button'>Delete</button>
-            <button onClick={closeConfirmModal} className='default-button'>Cancel</button>
-          </Modal>
-
-          <Modal
-            isOpen={subnoteEditModalIsOpen}
-            onRequestClose={handleCloseSubnoteEditModal}
-            contentLabel="Subnote Edit Form"
-            overlayClassName="ReactModal__Overlay"
-            className="ReactModal__Content"
-          >
-            {noteIdToEdit && subnoteToEdit && <SubnoteEditForm noteId={noteIdToEdit} subnoteId={subnoteToEdit} onSubnoteUpdated={handleSubnoteUpdated} />}
-            <button onClick={handleCloseSubnoteEditModal} className='default-button'>Close</button>
-          </Modal>
-
-          <Modal
-  isOpen={confirmSubnoteModalIsOpen}
-  onRequestClose={() => setConfirmSubnoteModalIsOpen(false)} 
-  contentLabel="Confirm Deletion"
-  overlayClassName="ReactModal__Overlay"
-  className="ReactModal__Content"
->
-  <h2>Are you sure you want to delete this?</h2>
-  <button onClick={confirmSubnoteDelete} className='default-button'>Yes, delete</button>
-  <button onClick={() => setConfirmSubnoteModalIsOpen(false)} className='default-button'>No, don't delete</button>
-</Modal>
-
-<Modal
-  isOpen={showAlarmTimeModal}
-  onRequestClose={() => setShowAlarmTimeModal(false)}
-  contentLabel="Alarm Time"
-  overlayClassName="ReactModal__Overlay"
-  className="ReactModal__Content"
->
-  <h2>Set alarm time</h2>
-  <input type="datetime-local" value={alarmTime.toISOString().substring(0, 16)} onChange={(e) => setAlarmTime(new Date(e.target.value))} />
-  <button onClick={handleAlarmTimeConfirm} className='default-button'>Confirm</button>
-  <button onClick={() => setShowAlarmTimeModal(false)} className='default-button'>Cancel</button>
-</Modal>
-
-<Modal
-        isOpen={showPropertyDeleteModal}
-        onRequestClose={handlePropertyDeleteCancel}
-        contentLabel="Confirm Propert Deletion"
+      <Modal
+        isOpen={confirmModalIsOpen}
+        onRequestClose={closeConfirmModal}
+        contentLabel="Confirm Deletion"
         overlayClassName="ReactModal__Overlay"
         className="ReactModal__Content"
       >
-        <h2>Delete {property.propertyName} and it's all information.</h2>
-       
+        <h2>Delete this, are you sure?</h2>
+        <p className='text-warning'>This will delete all information about this note permanently.</p>
+        <button onClick={handleNoteDelete} className='delete-button'>Delete</button>
+        <button onClick={closeConfirmModal} className='default-button'>Cancel</button>
+      </Modal>
+
+      <Modal
+        isOpen={subnoteEditModalIsOpen}
+        onRequestClose={handleCloseSubnoteEditModal}
+        contentLabel="Subnote Edit Form"
+        overlayClassName="ReactModal__Overlay"
+        className="ReactModal__Content"
+      >
+        {noteIdToEdit && subnoteToEdit && <SubnoteEditForm noteId={noteIdToEdit} subnoteId={subnoteToEdit} onSubnoteUpdated={handleSubnoteUpdated} />}
+        <button onClick={handleCloseSubnoteEditModal} className='default-button'>Close</button>
+      </Modal>
+
+      <Modal
+        isOpen={confirmSubnoteModalIsOpen}
+        onRequestClose={() => setConfirmSubnoteModalIsOpen(false)} 
+        contentLabel="Confirm Deletion"
+        overlayClassName="ReactModal__Overlay"
+        className="ReactModal__Content"
+      >
+        <h2>Are you sure you want to delete this?</h2>
+        <button onClick={confirmSubnoteDelete} className='default-button'>Yes, delete</button>
+        <button onClick={() => setConfirmSubnoteModalIsOpen(false)} className='default-button'>No, don't delete</button>
+      </Modal>
+
+      <Modal
+      isOpen={showAlarmTimeModal}
+      onRequestClose={() => setShowAlarmTimeModal(false)}
+      contentLabel="Alarm Time"
+      overlayClassName="ReactModal__Overlay"
+      className="ReactModal__Content"
+    >
+      <h2>Set alarm time</h2>
+      <input 
+        type="datetime-local" 
+        value={alarmTime.toISOString().substring(0, 16)} 
+        onChange={(e) => setAlarmTime(new Date(e.target.value))} 
+        onFocus={handleFocus}
+        onBlur={handleBlur}
+        onInput={handleInput}
+        readOnly
+      />
+      <button onClick={handleAlarmTimeConfirm} className='default-button'>Confirm</button>
+      <button onClick={() => setShowAlarmTimeModal(false)} className='default-button'>Cancel</button>
+    </Modal>
+
+      <Modal
+        isOpen={showPropertyDeleteModal}
+        onRequestClose={handlePropertyDeleteCancel}
+        contentLabel="Confirm Property Deletion"
+        overlayClassName="ReactModal__Overlay"
+        className="ReactModal__Content"
+      >
+        <h2>Delete {property.propertyName} and all its information.</h2>
         <p className='text-warning'>This will delete all information about {property.propertyName} permanently.</p>
         <p>Are you sure you want to delete {property.propertyName}?</p>
         <button onClick={handleDeletePropertyConfirmation} className='delete-button'>Delete {property.propertyName}</button>
@@ -429,10 +440,9 @@ const handleAlarmTimeConfirm = () => {
         overlayClassName="ReactModal__Overlay"
         className="ReactModal__Content"
       >
-        <NoteForm propertyId={id} onNoteAdded={handleNoteAdded} />
+        <NoteForm propertyId={property.id} onNoteAdded={handleNoteAdded} />
         <button onClick={handleCloseModal} className='default-button'>Close Note</button>
       </Modal>
-
     </div>
   );
 }

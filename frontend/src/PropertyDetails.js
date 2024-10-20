@@ -264,9 +264,9 @@ const handleInput = (e) => {
     <div>
       <section className='property-details-main'>
       <article className="property-card">
-        <button onClick={() => setShowPropertyDeleteModal(true)} className='delete-link-button'> <FiTrash/> </button>      
 
         <h2>{property.propertyName}</h2>
+        <hr></hr>
         <p>{property.address}, {property.city}</p>
 
         <table className='subnote-table'>
@@ -297,6 +297,9 @@ const handleInput = (e) => {
         </table>
         <button onClick={handleBack} className='default-button'>Go Back</button>
         <button onClick={handleOpenModal} className='add-button'>Add Note</button>
+        <hr></hr>
+        <button onClick={() => setShowPropertyDeleteModal(true)} className='delete-link-button'> <FiTrash/> Delete property </button>      
+
       </article>
 
       {/* Display notes */}

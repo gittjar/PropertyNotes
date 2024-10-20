@@ -6,7 +6,9 @@ const PropertySchema = new mongoose.Schema({
   address: String,
   city: String,
   notes: [{
-    note: { type: mongoose.Schema.Types.ObjectId, ref: 'Note', required: false } 
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Note',
+    required: false
   }]
 });
 

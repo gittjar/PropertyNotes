@@ -1,4 +1,5 @@
 const express = require('express');
+const mongoose = require('mongoose');
 const router = express.Router();
 const Property = require('./models/property');
 const Note = require('./models/note');
@@ -38,8 +39,7 @@ router.post('/api/properties/', (req, res) => {
       console.error(err);
       res.status(400).json('Error: ' + err);
     });
-}
-);
+});
 
 router.get('/api/properties/:id', (req, res) => {
   Property.findById(req.params.id)
@@ -51,7 +51,6 @@ router.get('/api/properties/:id', (req, res) => {
     });
 });
 
-
 router.delete('/api/properties/:id', (req, res) => {
   Property.findByIdAndDelete(req.params.id)
     .then(() => res.json('Property deleted!'))
@@ -60,7 +59,6 @@ router.delete('/api/properties/:id', (req, res) => {
       res.status(400).json('Error: ' + err);
     });
 });
-
 
 router.post('/api/properties/:id/notes', (req, res) => {
   const propertyId = req.params.id;
@@ -95,9 +93,6 @@ router.get('/api/properties/:id/notes', (req, res) => {
     });
 });
 
-
-
-
 router.put('/api/notes/:id', (req, res) => {
   console.log('Params:', req.params);
   console.log('Body:', req.body);
@@ -121,7 +116,6 @@ router.put('/api/notes/:id', (req, res) => {
       res.status(400).json('Error: ' + err);
     });
 });
-
 
 router.delete('/api/notes/:id', async (req, res) => {
   const noteId = req.params.id;

@@ -112,23 +112,29 @@ function App() {
           </thead>
           <tbody>
             {properties.map(property => (
-              <tr key={property._id}>
-                <td>
-                  <Link to={`/properties/${property._id}`}>
-                    {property.propertyName} <BsArrowUpRight/>
-                  </Link>
-                </td>
-                <td>
-                  {property.alarm && <span className="text-warning"> <BsExclamationTriangleFill /> {property.pastAlarmsCount}</span>} 
-                </td>
-                <td>{Array.isArray(property.notes) ? property.notes.length - property.notes.filter(note => note.subnotes && Array.isArray(note.subnotes) && note.subnotes.every(subnote => subnote.isTrue)).length : 0}</td>
-                <td>{Array.isArray(property.notes) ? property.notes.length : 0}</td>
-                <td>{Array.isArray(property.notes) ? property.notes.filter(note => note.subnotes && Array.isArray(note.subnotes) && note.subnotes.every(subnote => subnote.isTrue)).length : 0}</td>
-                <td>{property.address}</td>
-                <td>{property.city}</td>
-                <td>
-                  <button onClick={() => handleOpenModal(property._id)} className='add-button'>
-                    Add Note / Todo
+               <tr key={property._id}>
+               <td>
+                 <Link to={`/properties/${property._id}`}>
+                   {property.propertyName} <BsArrowUpRight/>
+                 </Link>
+               </td>
+               <td>
+                 {property.alarm && <span className="text-warning"> <BsExclamationTriangleFill /> {property.pastAlarmsCount}</span>} 
+               </td>
+               <td>
+                 {Array.isArray(property.notes) ? property.notes.filter(note => note.subnotes && Array.isArray(note.subnotes) && !note.subnotes.every(subnote => subnote.isTrue)).length : 0}
+               </td>
+               <td>
+                 {Array.isArray(property.notes) ? property.notes.length : 0}
+               </td>
+               <td>
+                 {Array.isArray(property.notes) ? property.notes.filter(note => note.subnotes && Array.isArray(note.subnotes) && note.subnotes.every(subnote => subnote.isTrue)).length : 0}
+               </td>
+               <td>{property.address}</td>
+               <td>{property.city}</td>
+               <td>
+                 <button onClick={() => handleOpenModal(property._id)} className='add-button'>
+                   Add Note / Todo
                   </button>
                 </td>
               </tr>

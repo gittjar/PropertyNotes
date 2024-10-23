@@ -5,7 +5,7 @@ import './Styles/styles.css';
 import './Styles/buttons.css';
 
 function NoteForm({ propertyId, onNoteAdded, propertyName }) {
-  const [newNote, setNewNote] = useState({ content: '', isTrue: false });
+  const [newNote, setNewNote] = useState({ content: '', isTrue: false, subnotes: [] });
 
   const handleNoteChange = (event) => {
     const value = event.target.type === 'checkbox' ? event.target.checked : event.target.value;
@@ -27,7 +27,7 @@ function NoteForm({ propertyId, onNoteAdded, propertyName }) {
       .then(response => {
         console.log(response.data);
         onNoteAdded(response.data);
-        setNewNote({ content: '', isTrue: false });
+        setNewNote({ content: '', isTrue: false, subnotes: [] });
       })
       .catch(error => {
         console.error('Error adding note:', error);

@@ -268,6 +268,11 @@ const handleInput = (e) => {
     handleOpenModal(propertyId);
   };
 
+  const totalNotes = notes.length;
+  const openNotes = notes.filter(note => note.subnotes.length === 0 || !note.subnotes.every(subnote => subnote.isTrue)).length;
+  const completedNotes = notes.filter(note => note.subnotes.length > 0 && note.subnotes.every(subnote => subnote.isTrue)).length;
+  const alertNotes = notes.filter(note => (note.subnotes.length === 0 || !note.subnotes.every(subnote => subnote.isTrue)) && isValidDate(note.alarmTime) && new Date(note.alarmTime) < new Date()).length;
+  
   return (
     <div>
       <section className='property-details-main'>
@@ -275,6 +280,11 @@ const handleInput = (e) => {
           <h2>{property.propertyName}</h2>
           <hr />
           <p>{property.address}, {property.city}</p>
+
+          <section>
+
+   
+          </section>
 
           <table className='subnote-table'>
             <thead>
@@ -284,22 +294,22 @@ const handleInput = (e) => {
               </tr>
             </thead>
             <tbody>
-              <tr>
-                <td>Total notes</td>
-                <td>{notes.length}</td>
-              </tr>
-              <tr>
-                <td>Open notes</td>
-                <td>{notes.filter(note => note.subnotes.length === 0 || !note.subnotes.every(subnote => subnote.isTrue)).length}</td>
-              </tr>
-              <tr>
-                <td>Completed notes</td>
-                <td>{notes.filter(note => note.subnotes.length === 0 || note.subnotes.every(subnote => subnote.isTrue)).length}</td>
-              </tr>
-              <tr>
-                <td>Alert notes</td>
-                <td>{notes.filter(note => (note.subnotes.length === 0 || !note.subnotes.every(subnote => subnote.isTrue)) && isValidDate(note.alarmTime) && new Date(note.alarmTime) < new Date()).length}</td>
-              </tr>
+                  <tr>
+              <td>Total notes</td>
+              <td>{totalNotes}</td>
+            </tr>
+            <tr>
+              <td>Open notes</td>
+              <td>{openNotes}</td>
+            </tr>
+            <tr>
+              <td>Completed notes</td>
+              <td>{completedNotes}</td>
+            </tr>
+            <tr>
+              <td>Alert notes</td>
+              <td>{alertNotes}</td>
+            </tr>
             </tbody>
           </table>
           <button onClick={handleBack} className='default-button'>Go Back</button>

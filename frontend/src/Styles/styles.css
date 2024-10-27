@@ -13,6 +13,11 @@ a {
     color: #512685;
 }
 
+.small-text {
+  font-size: 0.75rem;
+  color: #777777;
+}
+
 .property-main, .property-details-main {
   margin-left: 2rem;
   margin-right: 2rem;

@@ -297,6 +297,7 @@ const formatDateForInput = (date) => {
     }
     return !note.subnotes.every(subnote => subnote.isTrue) && isValidDate(note.alarmTime) && new Date(note.alarmTime) < new Date(); // If subnotes exist, check if not all are completed and alarm time is valid and in the past
   }).length;
+
   return (
     <div>
       <section className='property-details-main'>
@@ -399,6 +400,8 @@ const formatDateForInput = (date) => {
                   ))}
                 </tbody>
               </table>
+              <p className='small-text'>When all subnotes are done, Note is completed.</p>
+
             </article>
 
             {/* Add SubnoteForm for each note */}

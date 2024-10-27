@@ -122,14 +122,25 @@ function App() {
                  {property.alarm && <span className="text-warning"> <BsExclamationTriangleFill /> {property.pastAlarmsCount}</span>} 
                </td>
                <td>
-                 {Array.isArray(property.notes) ? property.notes.filter(note => note.subnotes && Array.isArray(note.subnotes) && !note.subnotes.every(subnote => subnote.isTrue)).length : 0}
-               </td>
-               <td>
-                 {Array.isArray(property.notes) ? property.notes.length : 0}
-               </td>
-               <td>
-                 {Array.isArray(property.notes) ? property.notes.filter(note => note.subnotes && Array.isArray(note.subnotes) && note.subnotes.every(subnote => subnote.isTrue)).length : 0}
-               </td>
+                    {Array.isArray(property.notes) ? property.notes.filter(note => {
+                      if (!note.subnotes || !Array.isArray(note.subnotes) || note.subnotes.length === 0) {
+                        return !note.isTrue; // If no subnotes, use the note's isTrue value
+                      }
+                      return !note.subnotes.every(subnote => subnote.isTrue); // If subnotes exist, check if not all are completed
+                    }).length : 0}
+                  </td>
+                  <td>
+                    {Array.isArray(property.notes) ? property.notes.length : 0}
+                  </td>
+                  <td>
+                    {Array.isArray(property.notes) ? property.notes.filter(note => {
+                      if (!note.subnotes || !Array.isArray(note.subnotes) || note.subnotes.length === 0) {
+                        return note.isTrue; // If no subnotes, use the note's isTrue value
+                      }
+                      return note.subnotes.every(subnote => subnote.isTrue); // If subnotes exist, check if all are completed
+                    }).length : 0}
+                  </td>
+               
                <td>{property.address}</td>
                <td>{property.city}</td>
                <td>

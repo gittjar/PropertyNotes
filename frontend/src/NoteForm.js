@@ -8,10 +8,10 @@ function NoteForm({ propertyId, onNoteAdded, propertyName }) {
   const [newNote, setNewNote] = useState({ content: '', isTrue: false, subnotes: [] });
 
   const handleNoteChange = (event) => {
-    const value = event.target.type === 'checkbox' ? event.target.checked : event.target.value;
+    const { name, value } = event.target;
     setNewNote({
       ...newNote,
-      [event.target.name]: value,
+      [name]: value,
     });
   };
 
@@ -23,10 +23,14 @@ function NoteForm({ propertyId, onNoteAdded, propertyName }) {
       return;
     }
 
-    axios.post(`${API_BASE_URL}/api/properties/${propertyId}/notes`, newNote)
+    // Ensure isTrue is always false when adding a new note
+    const noteToAdd = { ...newNote, isTrue: false };
+
+    axios.post(`${API_BASE_URL}/api/properties/${propertyId}/notes`, noteToAdd)
       .then(response => {
         console.log(response.data);
         onNoteAdded(response.data);
+        // Reset the form state after successful submission
         setNewNote({ content: '', isTrue: false, subnotes: [] });
       })
       .catch(error => {
@@ -45,12 +49,6 @@ function NoteForm({ propertyId, onNoteAdded, propertyName }) {
         placeholder="Note content" 
         className='input-addnote' 
       />
-      <input 
-        type="checkbox" 
-        name="isTrue" 
-        checked={newNote.isTrue} 
-        onChange={handleNoteChange} 
-      /> Done ?
       <hr />
       <button type="submit" className='add-button'>Add Note</button>
     </form>

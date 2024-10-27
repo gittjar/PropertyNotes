@@ -259,7 +259,14 @@ const handleBlur = (e) => {
 };
 
 const handleInput = (e) => {
-  e.target.value = alarmTime.toISOString().substring(0, 16);
+  setAlarmTime(new Date(e.target.value));
+};
+
+
+const formatDateForInput = (date) => {
+  const offset = date.getTimezoneOffset();
+  const localDate = new Date(date.getTime() - (offset * 60 * 1000));
+  return localDate.toISOString().substring(0, 16);
 };
 
 
@@ -269,10 +276,27 @@ const handleInput = (e) => {
   };
 
   const totalNotes = notes.length;
-  const openNotes = notes.filter(note => note.subnotes.length === 0 || !note.subnotes.every(subnote => subnote.isTrue)).length;
-  const completedNotes = notes.filter(note => note.subnotes.length > 0 && note.subnotes.every(subnote => subnote.isTrue)).length;
-  const alertNotes = notes.filter(note => (note.subnotes.length === 0 || !note.subnotes.every(subnote => subnote.isTrue)) && isValidDate(note.alarmTime) && new Date(note.alarmTime) < new Date()).length;
+
+  const openNotes = notes.filter(note => {
+    if (!note.subnotes || note.subnotes.length === 0) {
+      return !note.isTrue; // If no subnotes, use the note's isTrue value
+    }
+    return !note.subnotes.every(subnote => subnote.isTrue); // If subnotes exist, check if not all are completed
+  }).length;
   
+  const completedNotes = notes.filter(note => {
+    if (!note.subnotes || note.subnotes.length === 0) {
+      return note.isTrue; // If no subnotes, use the note's isTrue value
+    }
+    return note.subnotes.every(subnote => subnote.isTrue); // If subnotes exist, check if all are completed
+  }).length;
+  
+  const alertNotes = notes.filter(note => {
+    if (!note.subnotes || note.subnotes.length === 0) {
+      return !note.isTrue && isValidDate(note.alarmTime) && new Date(note.alarmTime) < new Date(); // If no subnotes, use the note's isTrue value
+    }
+    return !note.subnotes.every(subnote => subnote.isTrue) && isValidDate(note.alarmTime) && new Date(note.alarmTime) < new Date(); // If subnotes exist, check if not all are completed and alarm time is valid and in the past
+  }).length;
   return (
     <div>
       <section className='property-details-main'>
@@ -419,25 +443,24 @@ const handleInput = (e) => {
         </Modal>
 
         <Modal
-          isOpen={showAlarmTimeModal}
-          onRequestClose={() => setShowAlarmTimeModal(false)}
-          contentLabel="Alarm Time"
-          overlayClassName="ReactModal__Overlay"
-          className="ReactModal__Content"
-        >
-          <h2>Set alarm time</h2>
-          <input
-            type="datetime-local"
-            value={alarmTime.toISOString().substring(0, 16)}
-            onChange={(e) => setAlarmTime(new Date(e.target.value))}
-            onFocus={handleFocus}
-            onBlur={handleBlur}
-            onInput={handleInput}
-            readOnly
-          />
-          <button onClick={handleAlarmTimeConfirm} className='default-button'>Confirm</button>
-          <button onClick={() => setShowAlarmTimeModal(false)} className='default-button'>Cancel</button>
-        </Modal>
+      isOpen={showAlarmTimeModal}
+      onRequestClose={() => setShowAlarmTimeModal(false)}
+      contentLabel="Alarm Time"
+      overlayClassName="ReactModal__Overlay"
+      className="ReactModal__Content"
+    >
+      <h2>Set alarm time</h2>
+      <input
+        type="datetime-local"
+        value={formatDateForInput(alarmTime)}
+        onChange={(e) => setAlarmTime(new Date(e.target.value))}
+        onFocus={handleFocus}
+        onBlur={handleBlur}
+        onInput={handleInput}
+      />
+      <button onClick={handleAlarmTimeConfirm} className='default-button'>Confirm</button>
+      <button onClick={() => setShowAlarmTimeModal(false)} className='default-button'>Cancel</button>
+    </Modal>
 
         <Modal
           isOpen={showPropertyDeleteModal}

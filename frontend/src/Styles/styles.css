@@ -11,6 +11,18 @@ h2 {
 a {
     text-decoration: none;
     color: #512685;
+    background-color: #fafafa;
+    padding: 0.4rem;
+    border-radius: 0.5rem;
+}
+
+.icon-hover-effect {
+  transition: transform 0.3s, color 0.3s;
+}
+
+.icon-hover-effect:hover {
+  transform: rotate(180deg);
+  color: #bc9ee1; /* Change to your desired hover color */
 }
 
 .small-text {
@@ -24,7 +36,7 @@ a {
 }
 
 a:hover {
-    color: #6a3e9e;
+    color: #7c39c9;
 }
 
 .text-warning {
@@ -190,3 +202,80 @@ input {
         background-color: #dddddd;
     }
 
+/* Mobile and Tablet Styles */
+@media (max-width: 768px) {
+  html {
+      font-size: 0.9rem;
+  }
+
+  .property-main, .property-details-main {
+      margin-left: 1rem;
+      margin-right: 1rem;
+  }
+
+  .property-card {
+      width: 100%;
+      padding: 20px;
+      margin: 0.5rem 0;
+  }
+
+  .property-table th, .property-table td {
+      font-size: 0.75rem;
+      padding: 6px;
+  }
+
+  .ReactModal__Content {
+      width: 90%;
+      max-width: none;
+  }
+
+  .note-card {
+      flex-direction: column;
+  }
+
+  .note-info, .subnotes {
+      width: 100%;
+      margin: 0.2rem 0;
+  }
+
+  .subnotes {
+    width: fit-content;
+  }
+
+  .subnote-table th, .subnote-table td {
+      font-size: 0.75rem;
+      padding: 2px;
+  }
+}
+
+@media (max-width: 480px) {
+  html {
+      font-size: 0.8rem;
+  }
+
+  .property-card {
+      padding: 15px;
+  }
+
+  .property-table th, .property-table td {
+      font-size: 0.7rem;
+      padding: 4px;
+  }
+
+  .ReactModal__Content {
+      padding: 10px;
+  }
+
+  .note-card {
+      padding: 0.2rem;
+  }
+
+  .subnotes {
+    width: fit-content;
+  }
+
+  .subnote-table th, .subnote-table td {
+      font-size: 0.7rem;
+      padding: 1px;
+  }
+}

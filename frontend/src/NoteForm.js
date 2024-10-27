@@ -49,7 +49,8 @@ function NoteForm({ propertyId, onNoteAdded, propertyName }) {
         placeholder="Note content" 
         className='input-addnote' 
       />
-      <hr />
+      <br />
+      <p className='small-text'>This creates open Note and alarm is automatic to set 7d from this moment.</p>
       <button type="submit" className='add-button'>Add Note</button>
     </form>
   );

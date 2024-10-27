@@ -1,7 +1,7 @@
 .default-button {
-    background-color: #512685;
-    color: white;
-    border: none;
+    background-color: transparent;
+    color: #512685;
+    border: 1px solid #512685;
     border-radius: 0.15rem;
     padding: 8px 16px;
     text-align: center;
@@ -10,16 +10,18 @@
     font-size: 12px;
     margin: 4px 2px;
     cursor: pointer;
+    transition: background-color 0.3s, color 0.3s;
 }
 
 .default-button:hover {
-    background-color: #6a3e9e;
+    background-color: #512685;
+    color: white;
 }
 
 .add-button {
-    background-color: #72de0e;
-    color: black;
-    border: 1px solid #72de0e;
+    background-color: transparent;
+    color: #56ae03;
+    border: 1px solid #56ae03;
     border-radius: 0.15rem;
     padding: 8px 16px;
     text-align: center;
@@ -28,16 +30,18 @@
     font-size: 12px;
     margin: 4px 2px;
     cursor: pointer;
+    transition: background-color 0.3s, color 0.3s;
 }
 
 .add-button:hover {
-    background-color: #a3f23e;
+    background-color: #56ae03;
+    color: black;
 }
 
 .delete-button {
-    background-color: #f23e3e;
-    color: white;
-    border: none;
+    background-color: transparent;
+    color: #f23e3e;
+    border: 1px solid #f23e3e;
     border-radius: 0.15rem;
     padding: 8px 16px;
     text-align: center;
@@ -46,34 +50,63 @@
     font-size: 12px;
     margin: 4px 2px;
     cursor: pointer;
+    transition: background-color 0.3s, color 0.3s;
 }
 
 .delete-button:hover {
-    background-color: #e40808;
+    background-color: #f23e3e;
+    color: white;
 }
 
 .edit-link-button {
-   border:0;
-    background-color:transparent;
+    border: 1px solid transparent;
+    background-color: transparent;
     color: #512685;
     text-decoration: none;
     cursor: pointer;
+    transition: background-color 0.3s, color 0.3s;
 }
 
 .edit-link-button:hover {
-    color: #502e77;
-    background-color: #e9e9ea;
+    color: white;
+    background-color: #512685;
 }
 
 .delete-link-button {
-    border:0;
-    background-color:transparent;
+    border: 1px solid transparent;
+    background-color: transparent;
     color: #f23e3e;
     text-decoration: none;
     cursor: pointer;
+    transition: background-color 0.3s, color 0.3s;
 }
 
 .delete-link-button:hover {
-    color: #e40808;
-    background-color: #e9e9ea;
+    color: white;
+    background-color: #f23e3e;
+}
+
+/* Mobile and Tablet Styles */
+@media (max-width: 768px) {
+    .default-button, .add-button, .delete-button {
+        padding: 6px 12px;
+        font-size: 10px;
+        margin: 3px 1px;
+    }
+
+    .edit-link-button, .delete-link-button {
+        font-size: 10px;
+    }
+}
+
+@media (max-width: 480px) {
+    .default-button, .add-button, .delete-button {
+        padding: 4px 8px;
+        font-size: 8px;
+        margin: 2px 1px;
+    }
+
+    .edit-link-button, .delete-link-button {
+        font-size: 8px;
+    }
 }

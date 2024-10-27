@@ -1,0 +1,46 @@
+.notification {
+    position: fixed;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    background-color: #ffffff;
+    color: rgb(0, 0, 0);
+    border: 2px solid rgb(46, 206, 6);
+    padding: 15px 30px 15px 60px; /* Add left padding to make space for the icon */
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.5s ease-in-out, visibility 0.5s ease-in-out, transform 0.5s ease-in-out;
+    z-index: 1000;
+    font-family: Arial, sans-serif;
+    font-size: 16px;
+    text-align: center;
+    overflow: hidden;
+}
+
+.notification::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 40px;
+    height: 100%;
+    background-color: rgb(46, 206, 6);
+}
+
+.notification .icon {
+    position: absolute;
+    top: 50%;
+    left: 20px;
+    transform: translate(-50%, -50%);
+    color: white;
+    font-size: 24px;
+}
+
+.notification.show {
+    opacity: 1;
+    visibility: visible;
+    transform: translateX(-50%) translateY(-10px);
+    animation: pixelate 0.5s ease-in-out;
+}

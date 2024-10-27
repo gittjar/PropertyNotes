@@ -128,8 +128,8 @@ function Properties() {
             <tr>
               <th>Property Name</th>
               <th>Warnings</th>
-              <th onClick={handleSortByOpenNotes} style={{ cursor: 'pointer' }}>
-                Notes open <BsArrowDownUp />
+              <th onClick={handleSortByOpenNotes}>
+                Notes open <BsArrowDownUp className="icon-hover-effect" style={{ cursor: 'pointer', marginLeft: '5px' }} />
               </th>
               <th>Notes total</th>
               <th>Notes done</th>
@@ -144,8 +144,9 @@ function Properties() {
                 <td>
                 <Link to={`/properties/${property._id}`}>
                   {property.propertyName}
+                  <BsArrowUpRight style={{ cursor: 'pointer', marginLeft: '15px' }} />
+
                 </Link>
-                <BsArrowUpRight onClick={() => handleOpenModal(property._id)} style={{ cursor: 'pointer', marginLeft: '5px' }} />
               </td>
                <td>
                  {property.alarm && <span className="text-warning"> <BsExclamationTriangleFill /> {property.pastAlarmsCount}</span>} 

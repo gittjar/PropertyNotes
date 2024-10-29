@@ -131,10 +131,10 @@ function Properties() {
               <th onClick={handleSortByOpenNotes}>
                 Notes open <BsArrowDownUp className="icon-hover-effect" style={{ cursor: 'pointer', marginLeft: '5px' }} />
               </th>
-              <th>Notes total</th>
-              <th>Notes done</th>
-              <th>Address</th>
-              <th>City</th>
+              <th className='notes-total'>Notes total</th>
+              <th className='notes-done'>Notes done</th>
+              <th className='address'>Address</th>
+              <th className='city'>City</th>
               <th>Note</th>
             </tr>
           </thead>
@@ -144,7 +144,7 @@ function Properties() {
                 <td>
                 <Link to={`/properties/${property._id}`}>
                   {property.propertyName}
-                  <BsArrowUpRight style={{ cursor: 'pointer', marginLeft: '15px' }} />
+                  <BsArrowUpRight className='icon-arrow-up-right' style={{ cursor: 'pointer', marginLeft: '15px' }} />
 
                 </Link>
               </td>
@@ -162,7 +162,7 @@ function Properties() {
                   <td>
                     {Array.isArray(property.notes) ? property.notes.length : 0}
                   </td>
-                  <td>
+                  <td className='notes-done'>
                     {Array.isArray(property.notes) ? property.notes.filter(note => {
                       if (!note.subnotes || !Array.isArray(note.subnotes) || note.subnotes.length === 0) {
                         return note.isTrue; // If no subnotes, use the note's isTrue value
@@ -171,11 +171,11 @@ function Properties() {
                     }).length : 0}
                   </td>
                
-               <td>{property.address}</td>
-               <td>{property.city}</td>
+               <td className='address'>{property.address}</td>
+               <td className='city'>{property.city}</td>
                <td>
                  <button onClick={() => handleOpenModal(property._id)} className='add-button'>
-                   Add Note / Todo
+                   Add Note
                   </button>
                 </td>
               </tr>

@@ -48,7 +48,7 @@ textarea {
     padding: 6px;
     border: 1px solid #512685;
     border-radius: 1px;
-    height: 50%;
+    height: 5rem;
 }
 
 input {
@@ -253,13 +253,23 @@ input {
       font-size: 0.8rem;
   }
 
+  a {
+      padding: 0.3rem;
+      margin: auto;
+      font-size: 0.65rem;
+
+  }
+
   .property-card {
       padding: 15px;
+      margin: 0.5rem 0;
+      max-width: fit-content ;
   }
 
   .property-table th, .property-table td {
       font-size: 0.7rem;
       padding: 4px;
+      width: fit-content;
   }
 
   .ReactModal__Content {
@@ -275,7 +285,11 @@ input {
   }
 
   .subnote-table th, .subnote-table td {
-      font-size: 0.7rem;
+      font-size: 0.6rem;
       padding: 1px;
+  }
+
+ .address, .city, .notes-done, .icon-arrow-up-right {
+display: none;
   }
 }

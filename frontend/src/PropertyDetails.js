@@ -7,10 +7,11 @@ import SubnoteForm from './SubnoteForm';
 import SubnoteEditForm from './SubnoteEditForm';
 import './Styles/buttons.css';
 import './Styles/styles.css';
+import './Styles/notification-warning.css';
 import Modal from 'react-modal';
 import { FiEdit, FiTrash } from "react-icons/fi";
 import { FiAlertCircle } from "react-icons/fi";
-
+import { BsExclamationTriangle } from "react-icons/bs";
 
 Modal.setAppElement('#root');
 
@@ -32,6 +33,9 @@ function PropertyDetails(){
   const [alarmTime, setAlarmTime] = useState(new Date());
   const [showAlarmTimeModal, setShowAlarmTimeModal] = useState(false);
   const [modalPropertyId, setModalPropertyId] = useState(null);
+  const [showNotificationWarning, setShowNotificationWarning] = useState(false);
+
+
 
 
   useEffect(() => {
@@ -99,10 +103,13 @@ function PropertyDetails(){
             .then(response => {
               setNotes(response.data);
             });
+   
         });
     }
     // Close the confirmation modal
     setConfirmModalIsOpen(false);
+
+
   };
   
   const openConfirmModal = (noteId) => {
@@ -175,6 +182,7 @@ const handleSubnoteDelete = (noteId, subnoteId) => {
   setSubnoteToDelete(subnoteId);
   setConfirmSubnoteModalIsOpen(true); // Use the new state variable here
 
+
 };
 
 // Perform the deletion in this function
@@ -202,16 +210,26 @@ const confirmSubnoteDelete = () => {
                 setNotes(notesWithSubnotes);
               });
           });
+
+        // Show notification
+        setShowNotificationWarning(true);
+        setTimeout(() => {
+          setShowNotificationWarning(false);
+        }, 3000); // Hide after 3 seconds
+      })
+      .catch(err => {
+        console.error(err);
       });
-      setConfirmSubnoteModalIsOpen(false); // Use the new state variable here
-    }
+
+    setConfirmSubnoteModalIsOpen(false); // Use the new state variable here
+  }
 };
 
-// Add this function inside the PropertyDetails component
 const handleDeletePropertyConfirmation = () => {
   axios.delete(`${API_BASE_URL}/api/properties/${id}`)
     .then(() => {
       navigate(-1);
+
     })
     .catch(err => {
       console.error(err);
@@ -341,6 +359,15 @@ const formatDateForInput = (date) => {
           <button onClick={() => openNoteModal(property._id)} className='add-button'>Add Note</button>
           <hr />
           <button onClick={() => setShowPropertyDeleteModal(true)} className='delete-link-button'> <FiTrash /> Delete property </button>
+          {showNotificationWarning && (
+        <div className="notification-warning show">
+          <BsExclamationTriangle className="icon" />
+          Subnote has been deleted successfully!
+        </div>
+      )}
+       
+       
+       
         </article>
 
         {/* Display notes */}
@@ -367,6 +394,9 @@ const formatDateForInput = (date) => {
               <article className='note-button-group'>
                 <button onClick={() => openAlarmTimeModal(note._id)} className='default-button'>Set alarm</button>
                 <button onClick={() => openConfirmModal(note._id)} className='delete-button'>Delete note <FiTrash /></button>
+ 
+             
+             
               </article>
             </article>
 
@@ -406,6 +436,7 @@ const formatDateForInput = (date) => {
 
             {/* Add SubnoteForm for each note */}
             <SubnoteForm noteId={note._id} onSubnoteAdded={handleSubnoteAdded} />
+ 
           </div>
         ))}
 

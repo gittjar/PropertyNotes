@@ -3,12 +3,13 @@ const mongoose = require('mongoose');
 const router = express.Router();
 const Property = require('./models/property');
 const Note = require('./models/note');
-const { ObjectId } = require('mongodb');
 
+// Root route
 router.get('/', (req, res) => {
   res.send('Hello from the backend server!');
 });
 
+// Create a new property
 router.post('/api/properties', (req, res) => {
   const newProperty = new Property(req.body);
 
@@ -20,6 +21,7 @@ router.post('/api/properties', (req, res) => {
     });
 });
 
+// Get all properties
 router.get('/api/properties', (req, res) => {
   Property.find()
     .populate('notes')
@@ -30,17 +32,7 @@ router.get('/api/properties', (req, res) => {
     });
 });
 
-router.post('/api/properties/', (req, res) => {
-  const newProperty = new Property(req.body);
-
-  newProperty.save()
-    .then(() => res.json('Property added: ' + newProperty))
-    .catch(err => {
-      console.error(err);
-      res.status(400).json('Error: ' + err);
-    });
-});
-
+// Get a property by ID
 router.get('/api/properties/:id', (req, res) => {
   Property.findById(req.params.id)
     .populate('notes')
@@ -51,6 +43,7 @@ router.get('/api/properties/:id', (req, res) => {
     });
 });
 
+// Delete a property by ID
 router.delete('/api/properties/:id', (req, res) => {
   Property.findByIdAndDelete(req.params.id)
     .then(() => res.json('Property deleted!'))
@@ -60,11 +53,11 @@ router.delete('/api/properties/:id', (req, res) => {
     });
 });
 
+// Add a note to a property
 router.post('/api/properties/:id/notes', (req, res) => {
   const propertyId = req.params.id;
   const alarmDays = req.body.alarmDays || 7; // Default to 7 if not provided
 
-  // Validate that 'propertyId' is a valid ObjectId
   if (!mongoose.Types.ObjectId.isValid(propertyId)) {
     return res.status(400).json({ error: 'Invalid property ID' });
   }
@@ -84,6 +77,7 @@ router.post('/api/properties/:id/notes', (req, res) => {
     });
 });
 
+// Get all notes for a property
 router.get('/api/properties/:id/notes', (req, res) => {
   Note.find({ property: req.params.id })
     .then(notes => res.json(notes))
@@ -93,10 +87,8 @@ router.get('/api/properties/:id/notes', (req, res) => {
     });
 });
 
+// Update a note by ID
 router.put('/api/notes/:id', (req, res) => {
-  console.log('Params:', req.params);
-  console.log('Body:', req.body);
-  
   Note.findById(req.params.id)
     .then(note => {
       if (req.body.content !== undefined) {
@@ -117,6 +109,7 @@ router.put('/api/notes/:id', (req, res) => {
     });
 });
 
+// Delete a note by ID
 router.delete('/api/notes/:id', async (req, res) => {
   const noteId = req.params.id;
 
@@ -126,12 +119,9 @@ router.delete('/api/notes/:id', async (req, res) => {
       return res.status(404).send('Note not found');
     }
 
-    console.log('Deleting note:', note);
-    // Delete all subnotes of the note
     note.subnotes = [];
     await note.save();
 
-    // Now delete the note itself
     await Note.findByIdAndDelete(noteId);
 
     res.status(200).send('Note and its subnotes deleted successfully');
@@ -141,7 +131,7 @@ router.delete('/api/notes/:id', async (req, res) => {
   }
 });
 
-/*SUBNOTES*/
+/* SUBNOTES */
 
 // Get all subnotes of a note
 router.get('/api/notes/:id/subnotes', (req, res) => {
@@ -178,7 +168,6 @@ router.post('/api/notes/:id/subnotes', (req, res) => {
         content: req.body.content,
         isTrue: req.body.isTrue,
         timestamp: new Date(),
-        // Add any other fields you want for your subnotes
       });
       return note.save();
     })
@@ -196,8 +185,7 @@ router.put('/api/notes/:noteId/subnotes/:subnoteId', (req, res) => {
       const subnote = note.subnotes.id(req.params.subnoteId);
       subnote.content = req.body.content;
       subnote.isTrue = req.body.isTrue;
-      timestamp: new Date();
-      // Update any other fields you want for your subnotes
+      subnote.timestamp = new Date();
       return note.save();
     })
     .then(() => res.json('Subnote updated!'))
@@ -217,12 +205,12 @@ router.delete('/api/notes/:noteId/subnotes/:subnoteId', (req, res) => {
       if (!subnote) {
         return res.status(404).send('Subnote not found');
       }
-      note.subnotes.pull(subnoteId); // Use the pull function to remove the subnote
+      note.subnotes.pull(subnoteId);
       return note.save();
     })
     .then(() => res.status(200).send('Subnote deleted'))
     .catch(err => {
-      console.error(err); // Log the error details
+      console.error(err);
       res.status(500).send(err);
     });
 });

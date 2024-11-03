@@ -10,4 +10,5 @@ Create properties, create notes for each properties, modify notes and set alarms
 
 
 #### Frontend:
+* https://propertynotes.netlify.app/
 * https://propertynotesapp-frontend.onrender.com/

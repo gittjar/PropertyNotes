@@ -1,9 +1,17 @@
 [build]
   base = "frontend"
   publish = "build"
-  command = "npm install && npm run build"
+  command = "npm install && npm run build && cd ../backend && npm install && npm run start"
+
+[functions]
+  directory = "backend"
 
 [[redirects]]
   from = "/*"
   to = "/index.html"
+  status = 200
+
+[[redirects]]
+  from = "/api/*"
+  to = "/.netlify/functions/server"
   status = 200

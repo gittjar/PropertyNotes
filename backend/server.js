@@ -1,8 +1,10 @@
+// backend/server.js
+
 require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
 const mongoose = require('mongoose');
-const routes = require('./routes'); 
+const routes = require('./routes');
 
 const app = express();
 

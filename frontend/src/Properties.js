@@ -7,6 +7,7 @@ import NoteForm from './NoteForm';
 import PropertyForm from './PropertyForm'
 import { API_BASE_URL } from './config';
 import './Styles/styles.css';
+import './Styles/spinner.css';
 
 Modal.setAppElement('#root');
 
@@ -16,6 +17,7 @@ function Properties() {
   const [modalPropertyId, setModalPropertyId] = useState(null);
   const [isPropertyFormModalOpen, setIsPropertyFormModalOpen] = useState(false);
   const [sortOrder, setSortOrder] = useState('asc');
+  const [loading, setLoading] = useState(true); // Add loading state
 
   const handleOpenModal = (id) => {
     setModalPropertyId(id);
@@ -35,6 +37,7 @@ function Properties() {
 
   useEffect(() => {
     const currentDate = new Date();
+    setLoading(true); // Set loading to true when starting the fetch
     axios.get(`${API_BASE_URL}/api/properties`)
       .then(response => {
         const properties = response.data;
@@ -62,6 +65,7 @@ function Properties() {
               return propertyWithNotes;
             });
             setProperties(propertiesWithNotes);
+            setLoading(false); // Set loading to false after data is fetched
         });
       });
     setPropertyAdded(false); // Reset the flag after fetching properties
@@ -139,19 +143,28 @@ function Properties() {
             </tr>
           </thead>
           <tbody>
-            {properties.map(property => (
-               <tr key={property._id}>
-                <td>
-                <Link to={`/properties/${property._id}`}>
-                  {property.propertyName}
-                  <BsArrowUpRight className='icon-arrow-up-right' style={{ cursor: 'pointer', marginLeft: '15px' }} />
+            {loading ? (
+              <tr>
+                <td colSpan="8">
+                <p>Loading data from database. Wait a moment ...</p>
 
-                </Link>
-              </td>
-               <td>
-                 {property.alarm && <span className="text-warning"> <BsExclamationTriangleFill /> {property.pastAlarmsCount}</span>} 
-               </td>
-               <td>
+                  <div className="spinner">
+                  </div>
+                </td>
+              </tr>
+            ) : (
+              properties.map(property => (
+                <tr key={property._id}>
+                  <td>
+                    <Link to={`/properties/${property._id}`}>
+                      {property.propertyName}
+                      <BsArrowUpRight className='icon-arrow-up-right' style={{ cursor: 'pointer', marginLeft: '15px' }} />
+                    </Link>
+                  </td>
+                  <td>
+                    {property.alarm && <span className="text-warning"> <BsExclamationTriangleFill /> {property.pastAlarmsCount}</span>} 
+                  </td>
+                  <td>
                     {Array.isArray(property.notes) ? property.notes.filter(note => {
                       if (!note.subnotes || !Array.isArray(note.subnotes) || note.subnotes.length === 0) {
                         return !note.isTrue; // If no subnotes, use the note's isTrue value
@@ -170,16 +183,16 @@ function Properties() {
                       return note.subnotes.every(subnote => subnote.isTrue); // If subnotes exist, check if all are completed
                     }).length : 0}
                   </td>
-               
-               <td className='address'>{property.address}</td>
-               <td className='city'>{property.city}</td>
-               <td>
-                 <button onClick={() => handleOpenModal(property._id)} className='add-button'>
-                   Add Note
-                  </button>
-                </td>
-              </tr>
-            ))}
+                  <td className='address'>{property.address}</td>
+                  <td className='city'>{property.city}</td>
+                  <td>
+                    <button onClick={() => handleOpenModal(property._id)} className='add-button'>
+                      Add Note
+                    </button>
+                  </td>
+                </tr>
+              ))
+            )}
           </tbody>
         </table>
 

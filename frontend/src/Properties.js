@@ -147,6 +147,7 @@ function Properties() {
               <tr>
                 <td colSpan="8">
                 <p>Loading data from database. Wait a moment ...</p>
+                <p>It can takes over 30 sec !</p>
 
                   <div className="spinner">
                   </div>

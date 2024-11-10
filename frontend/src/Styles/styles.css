@@ -71,10 +71,10 @@ input {
 }
 
 /* BUTTON GROUP */
-.note-button-group {
+.note-button-group, .sort-button-group {
     display: flex;
     flex-direction: row;
-    margin: 0.1rem 0;
+    margin: 0.2rem 0;
 }
 
 /* PROPERTY CARD */
@@ -162,9 +162,12 @@ input {
   }
 
   .note-info-row {
-    margin: 4px 0; /* Adjust as needed */
-    padding: 0; /* Adjust as needed */
+    margin: 4px 0;
+    background-color: #ebede5;
+    border-bottom: 1px solid #512685;
+    padding: 1px; 
     font-size: small;
+    
   }
 
   .subnotes {

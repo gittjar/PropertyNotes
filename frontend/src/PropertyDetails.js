@@ -12,6 +12,7 @@ import Modal from 'react-modal';
 import { FiEdit, FiTrash } from "react-icons/fi";
 import { FiAlertCircle } from "react-icons/fi";
 import { BsExclamationTriangle } from "react-icons/bs";
+import NoteSorter from './NoteSorter';
 
 Modal.setAppElement('#root');
 
@@ -34,41 +35,33 @@ function PropertyDetails(){
   const [showAlarmTimeModal, setShowAlarmTimeModal] = useState(false);
   const [modalPropertyId, setModalPropertyId] = useState(null);
   const [showNotificationWarning, setShowNotificationWarning] = useState(false);
-
-
-
+  const [originalNotes, setOriginalNotes] = useState([]);
 
   useEffect(() => {
-
-    
-    // Fetch property details
     axios.get(`${API_BASE_URL}/api/properties/${id}`)
       .then(response => {
         setProperty(response.data);
       });
 
-    // Fetch related notes
-  // Fetch related notes
-  axios.get(`${API_BASE_URL}/api/properties/${id}/notes`)
-    .then(response => {
-      const fetchedNotes = response.data;
+    axios.get(`${API_BASE_URL}/api/properties/${id}/notes`)
+      .then(response => {
+        const fetchedNotes = response.data;
+        const promises = fetchedNotes.map(note =>
+          axios.get(`${API_BASE_URL}/api/notes/${note._id}/subnotes`)
+        );
 
-      // Fetch subnotes for each note
-      const promises = fetchedNotes.map(note =>
-        axios.get(`${API_BASE_URL}/api/notes/${note._id}/subnotes`)
-      );
+        Promise.all(promises)
+          .then(subnoteResponses => {
+            const notesWithSubnotes = fetchedNotes.map((note, index) => ({
+              ...note,
+              subnotes: subnoteResponses[index].data
+            }));
 
-      Promise.all(promises)
-        .then(subnoteResponses => {
-          const notesWithSubnotes = fetchedNotes.map((note, index) => ({
-            ...note,
-            subnotes: subnoteResponses[index].data
-          }));
-
-          setNotes(notesWithSubnotes);
-        });
-    });
-}, [id]);
+            setNotes(notesWithSubnotes);
+            setOriginalNotes(notesWithSubnotes);
+          });
+      });
+  }, [id]);
 
 
   const handleOpenModal = () => {
@@ -325,10 +318,7 @@ const formatDateForInput = (date) => {
           <p>{property.address}, {property.city}</p>
 
           <section>
-
-   
           </section>
-
           <table className='subnote-table'>
             <thead>
               <tr>
@@ -366,16 +356,17 @@ const formatDateForInput = (date) => {
         </div>
       )}
        
-       
+
        
         </article>
-
+      <section className='notes-sort-section'>
+      <NoteSorter originalNotes={originalNotes} setNotes={setNotes} />
+      </section>
         {/* Display notes */}
         {notes.map(note => (
           <div key={note.id} className='note-card'>
             <article className='note-info'>
-              <h4>{note.content}</h4>
-              <p className="note-info-row">Created at: {new Date(note.createdAt).toLocaleString()}</p>
+              <div className="note-info-row">Created at: {new Date(note.createdAt).toLocaleString()}</div>
               <p className="note-info-row">Last updated at: {new Date(note.updatedAt).toLocaleString()}</p>
               <p className="note-info-row">
                 {note.alarmTime && isValidDate(note.alarmTime) && new Date(note.alarmTime) < new Date() && (
@@ -402,7 +393,8 @@ const formatDateForInput = (date) => {
 
             {/* Display subnotes */}
             <article className='subnotes'>
-              <h4>Subnotes</h4>
+              <h4>{note.content}</h4>
+
               <table className='subnote-table'>
                 <thead>
                   <tr>

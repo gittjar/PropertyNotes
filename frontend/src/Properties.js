@@ -127,6 +127,9 @@ function Properties() {
       <section className='property-main'>
         <h2>Property Notes App</h2>
         <button onClick={handleOpenPropertyFormModal} className='add-button'>Add property</button>
+        <Link to="/contact">
+        <button className='default-button'>Contact Us</button>
+      </Link>
         <table className='property-table'>
           <thead>
             <tr>

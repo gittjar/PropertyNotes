@@ -8,6 +8,8 @@ import PropertyForm from './PropertyForm'
 import { API_BASE_URL } from './config';
 import './Styles/styles.css';
 import './Styles/spinner.css';
+import './Styles/notification-success.css';
+import './Styles/notification-warning.css';
 
 Modal.setAppElement('#root');
 
@@ -18,6 +20,7 @@ function Properties() {
   const [isPropertyFormModalOpen, setIsPropertyFormModalOpen] = useState(false);
   const [sortOrder, setSortOrder] = useState('asc');
   const [loading, setLoading] = useState(true); // Add loading state
+  const [showNotification, setShowNotification] = useState(false);
 
   const handleOpenModal = (id) => {
     setModalPropertyId(id);
@@ -66,6 +69,7 @@ function Properties() {
             });
             setProperties(propertiesWithNotes);
             setLoading(false); // Set loading to false after data is fetched
+            
         });
       });
     setPropertyAdded(false); // Reset the flag after fetching properties
@@ -89,6 +93,11 @@ function Properties() {
 
   const handlePropertyAdded = (newProperty) => {
     setPropertyAdded(true); // Trigger useEffect to re-fetch properties
+    setShowNotification(true); // Show notification
+    setTimeout(() => {
+      setShowNotification(false); // Hide notification after 5 seconds
+    }, 5000);
+    // Add the new property to the properties state
     setProperties(prevProperties => [
       ...prevProperties, 
       { ...newProperty, notes: [] }
@@ -199,6 +208,13 @@ function Properties() {
             )}
           </tbody>
         </table>
+
+        {showNotification && (
+          <div className="notification show">
+            <BsExclamationTriangleFill className="icon" />
+            New property : {properties[properties.length - 1]?.propertyName} is created successfully!
+          </div>
+        )}
 
         <Modal
           isOpen={modalPropertyId !== null}

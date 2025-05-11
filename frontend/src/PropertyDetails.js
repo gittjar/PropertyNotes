@@ -345,7 +345,7 @@ const formatDateForInput = (date) => {
             </tr>
             </tbody>
           </table>
-          <button onClick={handleBack} className='default-button'>Go Back</button>
+          <button onClick={handleBack} className='default-button'>Back to Properties list</button>
           <button onClick={() => openNoteModal(property._id)} className='add-button'>Add Note</button>
           <hr />
           <button onClick={() => setShowPropertyDeleteModal(true)} className='delete-link-button'> <FiTrash /> Delete property </button>

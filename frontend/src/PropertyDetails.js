@@ -360,45 +360,57 @@ const formatDateForInput = (date) => {
        
         </article>
       <section className='notes-sort-section'>
+
       <NoteSorter originalNotes={originalNotes} setNotes={setNotes} />
+
       </section>
+      
         {/* Display notes */}
         {notes.map(note => (
+
+          
           <div key={note.id} className='note-card'>
-            <article className='note-info'>
-              <div className="note-info-row">Created at: {new Date(note.createdAt).toLocaleString()}</div>
-              <p className="note-info-row">Last updated at: {new Date(note.updatedAt).toLocaleString()}</p>
+  
+      
+
+            {/* Display subnotes */}
+            <article className='subnotes'>
+            <article className='subnote-head'>
+            <div className='header4'>{note.content}   </div>
+              <span>Status:
+               {note.subnotes.length === 0
+                  ? (note.isTrue ? ' Completed' : ' Open')
+                  : (note.subnotes.every(subnote => subnote.isTrue) ? ' Completed' : ' Open')
+                }
+              </span>
+         
+            </article>
+
+            <section className='subnote-head'>
+
+            <section className='subnote-times'>
+              <p className='small-text note-info-row'>Created at: {new Date(note.createdAt).toLocaleString()}</p>
+              <p className='small-text note-info-row'>Last updated at: {new Date(note.updatedAt).toLocaleString()}</p>
               <p className="note-info-row">
                 {note.alarmTime && isValidDate(note.alarmTime) && new Date(note.alarmTime) < new Date() && (
                   <span className='text-warning'> <FiAlertCircle /> </span>
                 )}
                 Alarm Time: {note.alarmTime ? new Date(note.alarmTime).toLocaleString() : 'Not set'}
               </p>
-              <p className="note-info-row">
-                Status:
-                {note.subnotes.length === 0
-                  ? (note.isTrue ? ' Completed' : ' Open')
-                  : (note.subnotes.every(subnote => subnote.isTrue) ? ' Completed' : ' Open')
-                }
-              </p>
-              <p className="note-info-row">Subnotes: {note.subnotes.length}</p>
-              <article className='note-button-group'>
+                    </section>
+            <article >
                 <button onClick={() => openAlarmTimeModal(note._id)} className='default-button'>Set alarm</button>
                 <button onClick={() => openConfirmModal(note._id)} className='delete-button'>Delete note <FiTrash /></button>
- 
-             
-             
               </article>
-            </article>
+            </section>
 
-            {/* Display subnotes */}
-            <article className='subnotes'>
-              <h4>{note.content}</h4>
+    
 
               <table className='subnote-table'>
                 <thead>
                   <tr>
-                    <th>Content</th>
+                    <th>Content / {note.subnotes.length} subnotes
+</th>
                     <th>Created At</th>
                     <th>Last Updated At</th>
                     <th>Status</th>
@@ -428,8 +440,10 @@ const formatDateForInput = (date) => {
 
             {/* Add SubnoteForm for each note */}
             <SubnoteForm noteId={note._id} onSubnoteAdded={handleSubnoteAdded} />
+            
  
           </div>
+          
         ))}
 
         <Modal

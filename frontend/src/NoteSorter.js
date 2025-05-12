@@ -33,10 +33,10 @@ function NoteSorter({ originalNotes, setNotes }) {
 
   return (
     <div className='sort-button-group'>
-      <button className='default-button' onClick={() => sortNotes('newest')}>Newest</button>
-      <button className='default-button' onClick={() => sortNotes('oldest')}>Oldest</button>
-      <button className='default-button' onClick={() => sortNotes('open')}>Open Notes</button>
-      <button className='default-button' onClick={() => sortNotes('completed')}>Completed Notes</button>
+      <button className='default-button' onClick={() => sortNotes('newest')}>Newest creation time</button>
+      <button className='default-button' onClick={() => sortNotes('oldest')}>Oldest creation time</button>
+      <button className='default-button' onClick={() => sortNotes('open')}>Show all Open Notes</button>
+      <button className='default-button' onClick={() => sortNotes('completed')}>Show all Completed Notes</button>
     </div>
   );
 }

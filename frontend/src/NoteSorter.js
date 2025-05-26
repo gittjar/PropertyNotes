@@ -1,10 +1,10 @@
 import React, { useEffect, useState } from 'react';
 
 function NoteSorter({ originalNotes, setNotes }) {
-  const [notes, setLocalNotes] = useState(originalNotes);
+  const [localNotes, setLocalNotes] = useState(originalNotes); // Correctly destructure state and setter
 
   useEffect(() => {
-    setLocalNotes(originalNotes);
+    setLocalNotes(originalNotes); // Update local state when originalNotes changes
   }, [originalNotes]);
 
   const sortNotes = (criteria) => {

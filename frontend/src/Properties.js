@@ -5,6 +5,7 @@ import Modal from 'react-modal';
 import NoteForm from './NoteForm';
 import PropertyForm from './PropertyForm';
 import { API_BASE_URL } from './config';
+import { getOpenNotesCount, getCompletedNotesCount } from './utils/propertyUtils';
 import './Styles/styles.css';
 import './Styles/spinner.css';
 import './Styles/notification-success.css';
@@ -191,23 +192,13 @@ function Properties() {
                     {property.alarm && <span className="text-warning"><WarningIcon /> {property.pastAlarmsCount}</span>}
                   </td>
                   <td>
-                    {Array.isArray(property.notes) ? property.notes.filter(note => {
-                      if (!note.subnotes || !Array.isArray(note.subnotes) || note.subnotes.length === 0) {
-                        return !note.isTrue; // If no subnotes, use the note's isTrue value
-                      }
-                      return !note.subnotes.every(subnote => subnote.isTrue); // If subnotes exist, check if not all are completed
-                    }).length : 0}
+                    {Array.isArray(property.notes) ? getOpenNotesCount(property.notes) : 0}
                   </td>
                   <td>
                     {Array.isArray(property.notes) ? property.notes.length : 0}
                   </td>
                   <td className='notes-done'>
-                    {Array.isArray(property.notes) ? property.notes.filter(note => {
-                      if (!note.subnotes || !Array.isArray(note.subnotes) || note.subnotes.length === 0) {
-                        return note.isTrue; // If no subnotes, use the note's isTrue value
-                      }
-                      return note.subnotes.every(subnote => subnote.isTrue); // If subnotes exist, check if all are completed
-                    }).length : 0}
+                    {Array.isArray(property.notes) ? getCompletedNotesCount(property.notes) : 0}
                   </td>
                   <td className='address'>{property.address}</td>
                   <td className='city'>{property.city}</td>

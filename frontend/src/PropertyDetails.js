@@ -3,20 +3,17 @@ import axios from 'axios';
 import { useParams, useNavigate } from 'react-router-dom';
 import { API_BASE_URL } from './config';
 import NoteForm from './NoteForm';
-import SubnoteForm from './SubnoteForm';
 import SubnoteEditForm from './SubnoteEditForm';
+import PropertySummaryCard from './components/PropertySummaryCard';
+import NoteCard from './components/NoteCard';
+import NoteSorter from './NoteSorter';
+import { getOpenNotesCount, getCompletedNotesCount, getAlertNotesCount, isValidDate, formatDateForInput } from './utils/propertyUtils';
 import './Styles/buttons.css';
 import './Styles/styles.css';
 import './Styles/notification-warning.css';
 import Modal from 'react-modal';
-import NoteSorter from './NoteSorter';
 
 Modal.setAppElement('#root');
-
-const EditIcon = () => <span aria-hidden="true">✎</span>;
-const DeleteIcon = () => <span aria-hidden="true">🗑</span>;
-const AlertIcon = () => <span className="warning-mark" aria-hidden="true">⚠</span>;
-const WarningBadge = () => <span className="warning-mark" aria-hidden="true">⚠</span>;
 
 function PropertyDetails(){
   const [property, setProperty] = useState(null);
@@ -257,12 +254,6 @@ const handleAlarmTimeConfirm = () => {
     });
 };
 
-const isValidDate = (dateString) => {
-  const date = new Date(dateString);
-  return date instanceof Date && !isNaN(date);
-};
-
-
 const handleFocus = (e) => {
   e.target.readOnly = false;
 };
@@ -276,13 +267,6 @@ const handleInput = (e) => {
 };
 
 
-const formatDateForInput = (date) => {
-  const offset = date.getTimezoneOffset();
-  const localDate = new Date(date.getTime() - (offset * 60 * 1000));
-  return localDate.toISOString().substring(0, 16);
-};
-
-
   const openNoteModal = (propertyId) => {
     setModalPropertyId(propertyId);
     handleOpenModal(propertyId);
@@ -290,164 +274,39 @@ const formatDateForInput = (date) => {
 
   const totalNotes = notes.length;
 
-  const openNotes = notes.filter(note => {
-    if (!note.subnotes || note.subnotes.length === 0) {
-      return !note.isTrue; // If no subnotes, use the note's isTrue value
-    }
-    return !note.subnotes.every(subnote => subnote.isTrue); // If subnotes exist, check if not all are completed
-  }).length;
-  
-  const completedNotes = notes.filter(note => {
-    if (!note.subnotes || note.subnotes.length === 0) {
-      return note.isTrue; // If no subnotes, use the note's isTrue value
-    }
-    return note.subnotes.every(subnote => subnote.isTrue); // If subnotes exist, check if all are completed
-  }).length;
-  
-  const alertNotes = notes.filter(note => {
-    if (!note.subnotes || note.subnotes.length === 0) {
-      return !note.isTrue && isValidDate(note.alarmTime) && new Date(note.alarmTime) < new Date(); // If no subnotes, use the note's isTrue value
-    }
-    return !note.subnotes.every(subnote => subnote.isTrue) && isValidDate(note.alarmTime) && new Date(note.alarmTime) < new Date(); // If subnotes exist, check if not all are completed and alarm time is valid and in the past
-  }).length;
+  const openNotes = getOpenNotesCount(notes);
+  const completedNotes = getCompletedNotesCount(notes);
+  const alertNotes = getAlertNotesCount(notes);
 
   return (
     <div>
       <section className='property-details-main'>
-        <article className="property-card">
-          <h2>{property.propertyName}</h2>
-          <hr />
-          <p>{property.address}, {property.city}</p>
+        <PropertySummaryCard
+          property={property}
+          totalNotes={totalNotes}
+          openNotes={openNotes}
+          completedNotes={completedNotes}
+          alertNotes={alertNotes}
+          onBack={handleBack}
+          onAddNote={openNoteModal}
+          onDeleteProperty={setShowPropertyDeleteModal}
+          showNotificationWarning={showNotificationWarning}
+        />
 
-          <section>
-          </section>
-          <table className='subnote-table'>
-            <thead>
-              <tr>
-                <th>Note Status</th>
-                <th>Count</th>
-              </tr>
-            </thead>
-            <tbody>
-                  <tr>
-              <td>Total notes</td>
-              <td>{totalNotes}</td>
-            </tr>
-            <tr>
-              <td>Open notes</td>
-              <td>{openNotes}</td>
-            </tr>
-            <tr>
-              <td>Completed notes</td>
-              <td>{completedNotes}</td>
-            </tr>
-            <tr>
-              <td>Alert notes</td>
-              <td>{alertNotes}</td>
-            </tr>
-            </tbody>
-          </table>
-          <div className="detail-actions button-group">
-            <button onClick={handleBack} className='default-button'>Back to Properties list</button>
-            <button onClick={() => openNoteModal(property._id)} className='add-button'>Add Note</button>
-          </div>
-          <hr />
-          <button onClick={() => setShowPropertyDeleteModal(true)} className='delete-link-button'> <DeleteIcon /> Delete property </button>
-          {showNotificationWarning && (
-        <div className="notification-warning show">
-          <WarningBadge />
-          <span>Subnote has been deleted successfully.</span>
-        </div>
-      )}
-       
+        <section className='notes-sort-section'>
+          <NoteSorter originalNotes={originalNotes} setNotes={setNotes} />
+        </section>
 
-       
-        </article>
-      <section className='notes-sort-section'>
-
-      <NoteSorter originalNotes={originalNotes} setNotes={setNotes} />
-
-      </section>
-      
-        {/* Display notes */}
         {notes.map(note => (
-
-          
-          <div key={note.id} className='note-card'>
-  
-      
-
-            {/* Display subnotes */}
-            <article className='subnotes'>
-            <article className='subnote-head'>
-            <div className='header4'>{note.content}   </div>
-              <span>Status:
-               {note.subnotes.length === 0
-                  ? (note.isTrue ? ' Completed' : ' Open')
-                  : (note.subnotes.every(subnote => subnote.isTrue) ? ' Completed' : ' Open')
-                }
-              </span>
-         
-            </article>
-
-            <section className='subnote-head'>
-
-            <section className='subnote-times'>
-              <p className='small-text note-info-row'>Created at: {new Date(note.createdAt).toLocaleString()}</p>
-              <p className='small-text note-info-row'>Last updated at: {new Date(note.updatedAt).toLocaleString()}</p>
-              <p className="note-info-row">
-                {note.alarmTime && isValidDate(note.alarmTime) && new Date(note.alarmTime) < new Date() && (
-                  <span className='text-warning'> <AlertIcon /> </span>
-                )}
-                Alarm Time: {note.alarmTime ? new Date(note.alarmTime).toLocaleString() : 'Not set'}
-              </p>
-                    </section>
-            <article >
-                <button onClick={() => openAlarmTimeModal(note._id)} className='default-button'>Set alarm</button>
-                <button onClick={() => openConfirmModal(note._id)} className='delete-button'>Delete note <DeleteIcon /></button>
-              </article>
-            </section>
-
-    
-
-              <table className='subnote-table'>
-                <thead>
-                  <tr>
-                    <th>Content / {note.subnotes.length} subnotes
-</th>
-                    <th>Created At</th>
-                    <th>Last Updated At</th>
-                    <th>Status</th>
-                    <th>Actions</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {note.subnotes.map(subnote => (
-                    <tr key={subnote._id}>
-                      <td className="truncate" title={subnote.content}>
-                        {subnote.content.length > 20 ? `${subnote.content.substring(0, 20)}...` : subnote.content}
-                      </td>
-                      <td>{new Date(subnote.createdAt).toLocaleString()}</td>
-                      <td>{new Date(subnote.updatedAt).toLocaleString()}</td>
-                      <td>{subnote.isTrue ? 'Completed' : 'Open'}</td>
-                      <td>
-                        <button onClick={() => handleOpenSubnoteEditModal(note._id, subnote._id)} className='edit-link-button'><EditIcon /></button>
-                        <button onClick={() => handleSubnoteDelete(note._id, subnote._id)} className='delete-link-button'><DeleteIcon /></button>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-              <p className='small-text'>When all subnotes are done, Note is completed.</p>
-
-            </article>
-
-            {/* Add SubnoteForm for each note */}
-            <SubnoteForm noteId={note._id} onSubnoteAdded={handleSubnoteAdded} />
-            
- 
-          </div>
-          
+          <NoteCard
+            key={note._id}
+            note={note}
+            onOpenAlarmTimeModal={openAlarmTimeModal}
+            onOpenConfirmModal={openConfirmModal}
+            onOpenSubnoteEditModal={handleOpenSubnoteEditModal}
+            onSubnoteDelete={handleSubnoteDelete}
+            onSubnoteAdded={handleSubnoteAdded}
+          />
         ))}
 
         <Modal

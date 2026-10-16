@@ -39,8 +39,9 @@ function SubnoteForm({ noteId, onSubnoteAdded }) {
     <div>
       <form onSubmit={handleAddSubnote}>
         <textarea name="content" value={newSubnote.content} onChange={handleSubnoteChange} placeholder="Subnote content" />
-        <br></br>
-        <button type="submit" className='add-button'>Add Subnote</button>
+        <div className="button-group form-button-group">
+          <button type="submit" className='add-button'>Add Subnote</button>
+        </div>
       </form>
       {showNotification && (
         <div className="notification-success show" style={{ position: 'relative', bottom: 'auto', left: 'auto', transform: 'none', marginTop: '12px' }}>

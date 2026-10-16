@@ -38,10 +38,10 @@ function NoteCard({
             </p>
           </section>
 
-          <article>
+          <div className='button-group note-action-group'>
             <button onClick={() => onOpenAlarmTimeModal(note._id)} className='default-button'>Set alarm</button>
             <button onClick={() => onOpenConfirmModal(note._id)} className='delete-button'>Delete note <DeleteIcon /></button>
-          </article>
+          </div>
         </section>
 
         <table className='subnote-table'>
@@ -63,9 +63,11 @@ function NoteCard({
                 <td>{new Date(subnote.createdAt).toLocaleString()}</td>
                 <td>{new Date(subnote.updatedAt).toLocaleString()}</td>
                 <td>{subnote.isTrue ? 'Completed' : 'Open'}</td>
-                <td>
-                  <button onClick={() => onOpenSubnoteEditModal(note._id, subnote._id)} className='edit-link-button'><EditIcon /></button>
-                  <button onClick={() => onSubnoteDelete(note._id, subnote._id)} className='delete-link-button'><DeleteIcon /></button>
+                <td className="table-action-cell">
+                  <div className='button-group table-action-group'>
+                    <button onClick={() => onOpenSubnoteEditModal(note._id, subnote._id)} className='edit-link-button'><EditIcon /></button>
+                    <button onClick={() => onSubnoteDelete(note._id, subnote._id)} className='delete-link-button'><DeleteIcon /></button>
+                  </div>
                 </td>
               </tr>
             ))}

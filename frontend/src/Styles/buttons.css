@@ -31,6 +31,7 @@
 .button-group {
     display: inline-flex;
     flex-wrap: wrap;
+    align-items: center;
     gap: 8px;
     padding: 6px;
     border-radius: 16px;
@@ -41,10 +42,13 @@
 
 .button-group .default-button,
 .button-group .add-button,
-.button-group .delete-button {
+.button-group .delete-button,
+.button-group .edit-link-button,
+.button-group .delete-link-button {
     margin: 0;
     border-radius: 10px;
     min-width: 0;
+    flex: 0 0 auto;
 }
 
 .button-group .default-button,

@@ -56,9 +56,12 @@ function SubnoteEditForm({ noteId, subnoteId, onSubnoteUpdated }) {
         <form onSubmit={handleUpdateSubnote}>
             <textarea name="content" value={updatedSubnote.content} onChange={handleSubnoteChange} placeholder="Subnote content" />
             <br></br>
-            <input type="checkbox" name="isTrue" checked={updatedSubnote.isTrue} onChange={handleSubnoteChange} /> Completed
-            <br></br>
-            <button type="submit" className='add-button'>Update Subnote</button>
+            <label>
+              <input type="checkbox" name="isTrue" checked={Boolean(updatedSubnote.isTrue)} onChange={handleSubnoteChange} /> Completed
+            </label>
+            <div className="button-group form-button-group">
+              <button type="submit" className='add-button'>Update Subnote</button>
+            </div>
         </form>
     );
 }

@@ -334,6 +334,20 @@ input:focus {
   margin-bottom: 8px;
 }
 
+.note-action-group,
+.table-action-group,
+.form-button-group,
+.modal-actions {
+  display: inline-flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+}
+
+.table-action-cell {
+  white-space: nowrap;
+}
+
 .sort-header {
   display: inline-flex;
   align-items: center;

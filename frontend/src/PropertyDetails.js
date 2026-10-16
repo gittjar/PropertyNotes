@@ -25,6 +25,21 @@ function PropertyDetails(){
   const { id } = useParams();
   const navigate = useNavigate();
   const [subnoteEditModalIsOpen, setSubnoteEditModalIsOpen] = useState(false);
+
+  const fetchNotesWithSubnotes = () => {
+    return axios.get(`${API_BASE_URL}/api/properties/${id}/notes`)
+      .then(response => {
+        const fetchedNotes = response.data || [];
+
+        return Promise.all(fetchedNotes.map(note =>
+          axios.get(`${API_BASE_URL}/api/notes/${note._id}/subnotes`)
+            .then(subnoteResponse => ({
+              ...note,
+              subnotes: subnoteResponse.data || []
+            }))
+        ));
+      });
+  };
   const [subnoteToEdit, setSubnoteToEdit] = useState(null);
   const [subnoteToDelete, setSubnoteToDelete] = useState(null);
   const [confirmSubnoteModalIsOpen, setConfirmSubnoteModalIsOpen] = useState(false);
@@ -42,23 +57,10 @@ function PropertyDetails(){
         setProperty(response.data);
       });
 
-    axios.get(`${API_BASE_URL}/api/properties/${id}/notes`)
-      .then(response => {
-        const fetchedNotes = response.data;
-        const promises = fetchedNotes.map(note =>
-          axios.get(`${API_BASE_URL}/api/notes/${note._id}/subnotes`)
-        );
-
-        Promise.all(promises)
-          .then(subnoteResponses => {
-            const notesWithSubnotes = fetchedNotes.map((note, index) => ({
-              ...note,
-              subnotes: subnoteResponses[index].data
-            }));
-
-            setNotes(notesWithSubnotes);
-            setOriginalNotes(notesWithSubnotes);
-          });
+    fetchNotesWithSubnotes()
+      .then(notesWithSubnotes => {
+        setNotes(notesWithSubnotes);
+        setOriginalNotes(notesWithSubnotes);
       });
   }, [id]);
 
@@ -77,31 +79,23 @@ function PropertyDetails(){
   };
 
   const handleNoteAdded = () => {
-    // Fetch related notes
-    axios.get(`${API_BASE_URL}/api/properties/${id}/notes`)
-      .then(response => {
-        setNotes(response.data);
-      });
-    // Close the modal
+    fetchNotesWithSubnotes().then(notesWithSubnotes => {
+      setNotes(notesWithSubnotes);
+      setOriginalNotes(notesWithSubnotes);
+    });
     handleCloseModal();
   };
 
   const handleNoteDelete = () => {
     if (noteToDelete) {
       axios.delete(`${API_BASE_URL}/api/notes/${noteToDelete}`)
-        .then(() => {
-          // Fetch related notes
-          axios.get(`${API_BASE_URL}/api/properties/${id}/notes`)
-            .then(response => {
-              setNotes(response.data);
-            });
-   
+        .then(() => fetchNotesWithSubnotes())
+        .then(notesWithSubnotes => {
+          setNotes(notesWithSubnotes);
+          setOriginalNotes(notesWithSubnotes);
         });
     }
-    // Close the confirmation modal
     setConfirmModalIsOpen(false);
-
-
   };
   
   const openConfirmModal = (noteId) => {
@@ -118,41 +112,22 @@ function PropertyDetails(){
   }
 
   const handleSubnoteAdded = () => {
-    // Fetch related notes
-    axios.get(`${API_BASE_URL}/api/properties/${id}/notes`)
-      .then(response => {
-        setNotes(response.data);
-      });
+    fetchNotesWithSubnotes().then(notesWithSubnotes => {
+      setNotes(notesWithSubnotes);
+      setOriginalNotes(notesWithSubnotes);
+    });
   };
 
   const handleSubnoteUpdated = (noteId, subnoteId, isTrue) => {
-    // Update the state of the notes and subnotes
     setNotes(prevNotes => prevNotes.map(note => 
       note._id === noteId ? {...note, subnotes: note.subnotes.map(subnote => 
         subnote._id === subnoteId ? {...subnote, isTrue} : subnote)} : note));
-  
-    // Fetch related notes
-    axios.get(`${API_BASE_URL}/api/properties/${id}/notes`)
-      .then(response => {
-        const fetchedNotes = response.data;
-  
-        // Fetch subnotes for each note
-        const promises = fetchedNotes.map(note =>
-          axios.get(`${API_BASE_URL}/api/notes/${note._id}/subnotes`)
-        );
-  
-        Promise.all(promises)
-          .then(subnoteResponses => {
-            const notesWithSubnotes = fetchedNotes.map((note, index) => ({
-              ...note,
-              subnotes: subnoteResponses[index].data
-            }));
-  
-            setNotes(notesWithSubnotes);
-          });
-      });
-  
-    // Close the subnote edit modal
+
+    fetchNotesWithSubnotes().then(notesWithSubnotes => {
+      setNotes(notesWithSubnotes);
+      setOriginalNotes(notesWithSubnotes);
+    });
+
     handleCloseSubnoteEditModal();
   };
 
@@ -181,39 +156,22 @@ const handleSubnoteDelete = (noteId, subnoteId) => {
 const confirmSubnoteDelete = () => {
   if (noteIdToEdit && subnoteToDelete) {
     axios.delete(`${API_BASE_URL}/api/notes/${noteIdToEdit}/subnotes/${subnoteToDelete}`)
+      .then(() => fetchNotesWithSubnotes())
+      .then(notesWithSubnotes => {
+        setNotes(notesWithSubnotes);
+        setOriginalNotes(notesWithSubnotes);
+      })
       .then(() => {
-        // Fetch related notes
-        axios.get(`${API_BASE_URL}/api/properties/${id}/notes`)
-          .then(response => {
-            const fetchedNotes = response.data;
-
-            // Fetch subnotes for each note
-            const promises = fetchedNotes.map(note =>
-              axios.get(`${API_BASE_URL}/api/notes/${note._id}/subnotes`)
-            );
-
-            Promise.all(promises)
-              .then(subnoteResponses => {
-                const notesWithSubnotes = fetchedNotes.map((note, index) => ({
-                  ...note,
-                  subnotes: subnoteResponses[index].data
-                }));
-
-                setNotes(notesWithSubnotes);
-              });
-          });
-
-        // Show notification
         setShowNotificationWarning(true);
         setTimeout(() => {
           setShowNotificationWarning(false);
-        }, 3000); // Hide after 3 seconds
+        }, 3000);
       })
       .catch(err => {
         console.error(err);
       });
 
-    setConfirmSubnoteModalIsOpen(false); // Use the new state variable here
+    setConfirmSubnoteModalIsOpen(false);
   }
 };
 
@@ -241,13 +199,11 @@ const openAlarmTimeModal = (noteId) => {
 
 const handleAlarmTimeConfirm = () => {
   axios.put(`${API_BASE_URL}/api/notes/${editingNoteId}`, { alarmTime: alarmTime.toISOString() })
-    .then(() => {
+    .then(() => fetchNotesWithSubnotes())
+    .then(notesWithSubnotes => {
+      setNotes(notesWithSubnotes);
+      setOriginalNotes(notesWithSubnotes);
       setShowAlarmTimeModal(false);
-      // Fetch related notes
-      axios.get(`${API_BASE_URL}/api/properties/${id}/notes`)
-        .then(response => {
-          setNotes(response.data);
-        });
     })
     .catch(err => {
       console.error(err);

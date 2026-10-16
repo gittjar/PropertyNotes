@@ -4,8 +4,11 @@ import { API_BASE_URL } from './config';
 import './Styles/styles.css';
 import './Styles/buttons.css';
 
+const CheckIcon = () => <span className="success-mark" aria-hidden="true">✓</span>;
+
 function NoteForm({ propertyId, onNoteAdded, propertyName }) {
   const [newNote, setNewNote] = useState({ content: '', isTrue: false, subnotes: [] });
+  const [showSuccess, setShowSuccess] = useState(false);
 
   const handleNoteChange = (event) => {
     const { name, value } = event.target;
@@ -30,6 +33,8 @@ function NoteForm({ propertyId, onNoteAdded, propertyName }) {
       .then(response => {
         console.log(response.data);
         onNoteAdded(response.data);
+        setShowSuccess(true);
+        setTimeout(() => setShowSuccess(false), 2500);
         // Reset the form state after successful submission
         setNewNote({ content: '', isTrue: false, subnotes: [] });
       })
@@ -52,6 +57,12 @@ function NoteForm({ propertyId, onNoteAdded, propertyName }) {
       <br />
       <p className='small-text'>This creates open Note and alarm is automatic to set 7d from this moment.</p>
       <button type="submit" className='add-button'>Add Note</button>
+      {showSuccess && (
+        <div className="notification-success show" style={{ position: 'relative', bottom: 'auto', left: 'auto', transform: 'none', marginTop: '12px' }}>
+          <CheckIcon />
+          <span>New note was created successfully.</span>
+        </div>
+      )}
     </form>
   );
 }

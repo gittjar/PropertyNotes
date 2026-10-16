@@ -9,12 +9,14 @@ import './Styles/buttons.css';
 import './Styles/styles.css';
 import './Styles/notification-warning.css';
 import Modal from 'react-modal';
-import { FiEdit, FiTrash } from "react-icons/fi";
-import { FiAlertCircle } from "react-icons/fi";
-import { BsExclamationTriangle } from "react-icons/bs";
 import NoteSorter from './NoteSorter';
 
 Modal.setAppElement('#root');
+
+const EditIcon = () => <span aria-hidden="true">✎</span>;
+const DeleteIcon = () => <span aria-hidden="true">🗑</span>;
+const AlertIcon = () => <span className="warning-mark" aria-hidden="true">⚠</span>;
+const WarningBadge = () => <span className="warning-mark" aria-hidden="true">⚠</span>;
 
 function PropertyDetails(){
   const [property, setProperty] = useState(null);
@@ -345,14 +347,16 @@ const formatDateForInput = (date) => {
             </tr>
             </tbody>
           </table>
-          <button onClick={handleBack} className='default-button'>Back to Properties list</button>
-          <button onClick={() => openNoteModal(property._id)} className='add-button'>Add Note</button>
+          <div className="detail-actions">
+            <button onClick={handleBack} className='default-button'>Back to Properties list</button>
+            <button onClick={() => openNoteModal(property._id)} className='add-button'>Add Note</button>
+          </div>
           <hr />
-          <button onClick={() => setShowPropertyDeleteModal(true)} className='delete-link-button'> <FiTrash /> Delete property </button>
+          <button onClick={() => setShowPropertyDeleteModal(true)} className='delete-link-button'> <DeleteIcon /> Delete property </button>
           {showNotificationWarning && (
         <div className="notification-warning show">
-          <BsExclamationTriangle className="icon" />
-          Subnote has been deleted successfully!
+          <WarningBadge />
+          <span>Subnote has been deleted successfully.</span>
         </div>
       )}
        
@@ -393,14 +397,14 @@ const formatDateForInput = (date) => {
               <p className='small-text note-info-row'>Last updated at: {new Date(note.updatedAt).toLocaleString()}</p>
               <p className="note-info-row">
                 {note.alarmTime && isValidDate(note.alarmTime) && new Date(note.alarmTime) < new Date() && (
-                  <span className='text-warning'> <FiAlertCircle /> </span>
+                  <span className='text-warning'> <AlertIcon /> </span>
                 )}
                 Alarm Time: {note.alarmTime ? new Date(note.alarmTime).toLocaleString() : 'Not set'}
               </p>
                     </section>
             <article >
                 <button onClick={() => openAlarmTimeModal(note._id)} className='default-button'>Set alarm</button>
-                <button onClick={() => openConfirmModal(note._id)} className='delete-button'>Delete note <FiTrash /></button>
+                <button onClick={() => openConfirmModal(note._id)} className='delete-button'>Delete note <DeleteIcon /></button>
               </article>
             </section>
 
@@ -427,8 +431,8 @@ const formatDateForInput = (date) => {
                       <td>{new Date(subnote.updatedAt).toLocaleString()}</td>
                       <td>{subnote.isTrue ? 'Completed' : 'Open'}</td>
                       <td>
-                        <button onClick={() => handleOpenSubnoteEditModal(note._id, subnote._id)} className='edit-link-button'><FiEdit /></button>
-                        <button onClick={() => handleSubnoteDelete(note._id, subnote._id)} className='delete-link-button'><FiTrash /></button>
+                        <button onClick={() => handleOpenSubnoteEditModal(note._id, subnote._id)} className='edit-link-button'><EditIcon /></button>
+                        <button onClick={() => handleSubnoteDelete(note._id, subnote._id)} className='delete-link-button'><DeleteIcon /></button>
                       </td>
                     </tr>
                   ))}
@@ -453,10 +457,12 @@ const formatDateForInput = (date) => {
           overlayClassName="ReactModal__Overlay"
           className="ReactModal__Content"
         >
-          <h2>Delete this, are you sure?</h2>
+          <h2>Delete this note?</h2>
           <p className='text-warning'>This will delete all information about this note permanently.</p>
-          <button onClick={handleNoteDelete} className='delete-button'>Delete</button>
-          <button onClick={closeConfirmModal} className='default-button'>Cancel</button>
+          <div className="modal-actions">
+            <button onClick={handleNoteDelete} className='delete-button'>Delete</button>
+            <button onClick={closeConfirmModal} className='default-button'>Cancel</button>
+          </div>
         </Modal>
 
         <Modal
@@ -477,9 +483,12 @@ const formatDateForInput = (date) => {
           overlayClassName="ReactModal__Overlay"
           className="ReactModal__Content"
         >
-          <h2>Are you sure you want to delete this?</h2>
-          <button onClick={confirmSubnoteDelete} className='default-button'>Yes, delete</button>
-          <button onClick={() => setConfirmSubnoteModalIsOpen(false)} className='default-button'>No, don't delete</button>
+          <h2>Delete this subnote?</h2>
+          <p className='text-warning'>This action cannot be undone.</p>
+          <div className="modal-actions">
+            <button onClick={confirmSubnoteDelete} className='delete-button'>Yes, delete</button>
+            <button onClick={() => setConfirmSubnoteModalIsOpen(false)} className='default-button'>No, keep it</button>
+          </div>
         </Modal>
 
         <Modal
@@ -509,11 +518,13 @@ const formatDateForInput = (date) => {
           overlayClassName="ReactModal__Overlay"
           className="ReactModal__Content"
         >
-          <h2>Delete {property.propertyName} and all its information.</h2>
+          <h2>Delete {property.propertyName}?</h2>
           <p className='text-warning'>This will delete all information about {property.propertyName} permanently.</p>
           <p>Are you sure you want to delete {property.propertyName}?</p>
-          <button onClick={handleDeletePropertyConfirmation} className='delete-button'>Delete {property.propertyName}</button>
-          <button onClick={handlePropertyDeleteCancel} className='default-button'>Cancel</button>
+          <div className="modal-actions">
+            <button onClick={handleDeletePropertyConfirmation} className='delete-button'>Delete {property.propertyName}</button>
+            <button onClick={handlePropertyDeleteCancel} className='default-button'>Cancel</button>
+          </div>
         </Modal>
 
         <Modal

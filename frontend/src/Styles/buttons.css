@@ -1,116 +1,120 @@
-.default-button {
-    background-color: transparent;
-    color: #512685;
-    border: 1px solid #512685;
-    border-radius: 0.15rem;
-    padding: 8px 16px;
+.default-button,
+.add-button,
+.delete-button,
+.edit-link-button,
+.delete-link-button {
+    appearance: none;
+    border: 1px solid transparent;
+    border-radius: 14px;
+    padding: 0.8rem 1.2rem;
+    min-height: 44px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.55rem;
+    font-size: 0.9rem;
+    font-weight: 700;
+    line-height: 1.2;
     text-align: center;
     text-decoration: none;
-    display: inline-block;
-    font-size: 12px;
-    margin: 4px 2px;
     cursor: pointer;
-    transition: background-color 0.3s, color 0.3s;
+    transition: transform 0.2s ease, box-shadow 0.2s ease, background 0.2s ease, color 0.2s ease, border-color 0.2s ease;
+    box-shadow: 0 8px 20px rgba(37, 99, 235, 0.12);
+}
+
+.default-button,
+.add-button,
+.delete-button {
+    min-width: 140px;
+}
+
+.default-button:hover,
+.add-button:hover,
+.delete-button:hover,
+.edit-link-button:hover,
+.delete-link-button:hover {
+    transform: translateY(-1px);
+}
+
+.default-button {
+    background: rgba(29, 78, 216, 0.06);
+    color: #173ea8;
+    border-color: rgba(29, 78, 216, 0.2);
 }
 
 .default-button:hover {
-    background-color: #512685;
-    color: white;
+    background: rgba(29, 78, 216, 0.12);
+    color: #0f2d75;
 }
 
 .add-button {
-    background-color: transparent;
-    color: #56ae03;
-    border: 1px solid #56ae03;
-    border-radius: 0.15rem;
-    padding: 8px 16px;
-    text-align: center;
-    text-decoration: none;
-    display: inline-block;
-    font-size: 12px;
-    margin: 4px 2px;
-    cursor: pointer;
-    transition: background-color 0.3s, color 0.3s;
+    background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
+    color: #ffffff;
+    border-color: #1d4ed8;
+    box-shadow: 0 12px 26px rgba(37, 99, 235, 0.22);
 }
 
 .add-button:hover {
-    background-color: #56ae03;
-    color: black;
+    background: linear-gradient(135deg, #1d4ed8 0%, #173ea8 100%);
+    color: #ffffff;
 }
 
 .delete-button {
-    background-color: transparent;
-    color: #f23e3e;
-    border: 1px solid #f23e3e;
-    border-radius: 0.15rem;
-    padding: 8px 16px;
-    text-align: center;
-    text-decoration: none;
-    display: inline-block;
-    font-size: 12px;
-    margin: 4px 2px;
-    cursor: pointer;
-    transition: background-color 0.3s, color 0.3s;
+    background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+    color: #ffffff;
+    border-color: #dc2626;
+    box-shadow: 0 12px 24px rgba(239, 68, 68, 0.2);
 }
 
 .delete-button:hover {
-    background-color: #f23e3e;
-    color: white;
+    background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%);
+    color: #ffffff;
 }
 
 .edit-link-button {
-    border: 1px solid transparent;
-    background-color: transparent;
-    color: #512685;
-    text-decoration: none;
-    cursor: pointer;
-    transition: background-color 0.3s, color 0.3s;
+    background: rgba(14, 116, 144, 0.08);
+    color: #0f766e;
+    border-color: rgba(15, 118, 110, 0.18);
 }
 
 .edit-link-button:hover {
-    color: white;
-    background-color: #512685;
+    background: #0f766e;
+    color: #ffffff;
 }
 
 .delete-link-button {
-    border: 1px solid transparent;
-    background-color: transparent;
-    color: #f23e3e;
-    text-decoration: none;
-    cursor: pointer;
-    transition: background-color 0.3s, color 0.3s;
-    padding: 0.2rem 0.5rem;
-    border-radius: 10px;
+    background: rgba(239, 68, 68, 0.08);
+    color: #b91c1c;
+    border-color: rgba(239, 68, 68, 0.2);
+    padding: 0.55rem 0.9rem;
 }
 
 .delete-link-button:hover {
-    color: white;
-    background-color: #f23e3e;
-    border-radius: 10px;
-    padding: 0.2rem 0.5rem;
+    background: #ef4444;
+    color: #ffffff;
 }
 
 /* Mobile and Tablet Styles */
 @media (max-width: 768px) {
-    .default-button, .add-button, .delete-button {
-        padding: 6px 12px;
-        font-size: 10px;
-        margin: 3px 1px;
-    }
-
-    .edit-link-button, .delete-link-button {
-        font-size: 10px;
+    .default-button,
+    .add-button,
+    .delete-button,
+    .edit-link-button,
+    .delete-link-button {
+        min-height: 40px;
+        padding: 0.7rem 1rem;
+        font-size: 0.82rem;
     }
 }
 
 @media (max-width: 480px) {
-    .default-button, .add-button, .delete-button {
-        padding: 4px 8px;
-        font-size: 8px;
-        margin: 2px 1px;
-    }
-
-    .edit-link-button, .delete-link-button {
-        font-size: 8px;
+    .default-button,
+    .add-button,
+    .delete-button,
+    .edit-link-button,
+    .delete-link-button {
+        width: auto;
+        min-height: 38px;
+        font-size: 0.76rem;
     }
 }

@@ -1,10 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { Link } from 'react-router-dom';
-import { BsArrowUpRight, BsArrowDownUp, BsExclamationTriangleFill } from "react-icons/bs";
 import Modal from 'react-modal';
 import NoteForm from './NoteForm';
-import PropertyForm from './PropertyForm'
+import PropertyForm from './PropertyForm';
 import { API_BASE_URL } from './config';
 import './Styles/styles.css';
 import './Styles/spinner.css';
@@ -12,6 +11,11 @@ import './Styles/notification-success.css';
 import './Styles/notification-warning.css';
 
 Modal.setAppElement('#root');
+
+const ArrowIcon = () => <span aria-hidden="true">↗</span>;
+const SortIcon = () => <span aria-hidden="true">⇅</span>;
+const WarningIcon = () => <span className="warning-mark" aria-hidden="true">⚠</span>;
+const CheckIcon = () => <span className="success-mark" aria-hidden="true">✓</span>;
 
 function Properties() {
   const [properties, setProperties] = useState([]);
@@ -134,18 +138,27 @@ function Properties() {
   return (
     <div>
       <section className='property-main'>
-        <h2>Property Notes App</h2>
-        <button onClick={handleOpenPropertyFormModal} className='add-button'>Add property</button>
-        <Link to="/contact">
-        <button className='default-button'>Contact Us</button>
-      </Link>
+        <header className="page-header">
+          <div>
+            <p className="small-text">Property overview</p>
+            <h2 className="page-header__title">Property Notes App</h2>
+          </div>
+          <div className="page-header__actions">
+            <button onClick={handleOpenPropertyFormModal} className='add-button'>Add property</button>
+            <Link to="/contact">
+              <button className='default-button'>Contact Us</button>
+            </Link>
+          </div>
+        </header>
+
         <table className='property-table'>
           <thead>
             <tr>
               <th>Property Name</th>
               <th>Warnings</th>
-              <th onClick={handleSortByOpenNotes}>
-                Notes open <BsArrowDownUp className="icon-hover-effect" style={{ cursor: 'pointer', marginLeft: '5px' }} />
+              <th onClick={handleSortByOpenNotes} className="sort-header">
+                <span>Notes open</span>
+                <SortIcon />
               </th>
               <th className='notes-total'>Notes total</th>
               <th className='notes-done'>Notes done</th>
@@ -169,13 +182,13 @@ function Properties() {
               properties.map(property => (
                 <tr key={property._id}>
                   <td>
-                    <Link to={`/properties/${property._id}`}>
-                      {property.propertyName}
-                      <BsArrowUpRight className='icon-arrow-up-right' style={{ cursor: 'pointer', marginLeft: '15px' }} />
+                    <Link to={`/properties/${property._id}`} className="property-link">
+                      <span>{property.propertyName}</span>
+                      <ArrowIcon />
                     </Link>
                   </td>
                   <td>
-                    {property.alarm && <span className="text-warning"> <BsExclamationTriangleFill /> {property.pastAlarmsCount}</span>} 
+                    {property.alarm && <span className="text-warning"><WarningIcon /> {property.pastAlarmsCount}</span>}
                   </td>
                   <td>
                     {Array.isArray(property.notes) ? property.notes.filter(note => {
@@ -210,9 +223,9 @@ function Properties() {
         </table>
 
         {showNotification && (
-          <div className="notification show">
-            <BsExclamationTriangleFill className="icon" />
-            New property : {properties[properties.length - 1]?.propertyName} is created successfully!
+          <div className="notification-success show">
+            <CheckIcon />
+            <span>New property: {properties[properties.length - 1]?.propertyName} was created successfully.</span>
           </div>
         )}
 

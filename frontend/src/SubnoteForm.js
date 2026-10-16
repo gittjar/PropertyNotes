@@ -4,7 +4,8 @@ import { API_BASE_URL } from './config';
 import './Styles/styles.css';
 import './Styles/buttons.css';
 import './Styles/notification-success.css';
-import { BsCheckSquare } from 'react-icons/bs';
+
+const CheckIcon = () => <span className="success-mark" aria-hidden="true">✓</span>;
 
 function SubnoteForm({ noteId, onSubnoteAdded }) {
   const [newSubnote, setNewSubnote] = useState({ content: '' });
@@ -42,9 +43,9 @@ function SubnoteForm({ noteId, onSubnoteAdded }) {
         <button type="submit" className='add-button'>Add Subnote</button>
       </form>
       {showNotification && (
-        <div className="notification show">
-          <BsCheckSquare className="icon" />
-          New Subnote is created successfully!
+        <div className="notification-success show" style={{ position: 'relative', bottom: 'auto', left: 'auto', transform: 'none', marginTop: '12px' }}>
+          <CheckIcon />
+          <span>New subnote was created successfully.</span>
         </div>
       )}
     </div>

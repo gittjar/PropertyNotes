@@ -143,7 +143,7 @@ function Properties() {
             <p className="small-text">Property overview</p>
             <h2 className="page-header__title">Property Notes App</h2>
           </div>
-          <div className="page-header__actions">
+          <div className="page-header__actions button-group">
             <button onClick={handleOpenPropertyFormModal} className='add-button'>Add property</button>
             <Link to="/contact">
               <button className='default-button'>Contact Us</button>

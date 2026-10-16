@@ -347,7 +347,7 @@ const formatDateForInput = (date) => {
             </tr>
             </tbody>
           </table>
-          <div className="detail-actions">
+          <div className="detail-actions button-group">
             <button onClick={handleBack} className='default-button'>Back to Properties list</button>
             <button onClick={() => openNoteModal(property._id)} className='add-button'>Add Note</button>
           </div>

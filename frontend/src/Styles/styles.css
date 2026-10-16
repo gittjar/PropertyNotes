@@ -334,6 +334,53 @@ input:focus {
   margin-bottom: 8px;
 }
 
+.subnote-edit-form {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.subnote-edit-form__field textarea {
+  width: 100%;
+  min-height: 120px;
+  resize: vertical;
+  padding: 12px 14px;
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.9);
+  color: var(--text);
+}
+
+.subnote-edit-form__row {
+  display: flex;
+  align-items: center;
+  width: 100%;
+}
+
+.subnote-edit-form__checkbox {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 42px;
+  padding: 10px 12px;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: rgba(29, 78, 216, 0.03);
+  color: var(--text);
+  font-weight: 600;
+}
+
+.subnote-edit-form__checkbox input {
+  width: 18px;
+  height: 18px;
+  accent-color: var(--primary);
+  margin: 0;
+}
+
+.subnote-edit-form__actions {
+  justify-content: flex-start;
+}
+
 .note-action-group,
 .table-action-group,
 .form-button-group,

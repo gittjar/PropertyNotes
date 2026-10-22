@@ -13,71 +13,84 @@ function NoteCard({
   onSubnoteDelete,
   onSubnoteAdded,
 }) {
+  const isCompleted = note.subnotes.length === 0
+    ? note.isTrue
+    : note.subnotes.every(subnote => subnote.isTrue);
+
   return (
-    <div key={note.id} className='note-card'>
-      <article className='subnotes'>
-        <article className='subnote-head'>
-          <div className='header4'>{note.content}</div>
-          <span>Status:
-            {note.subnotes.length === 0
-              ? (note.isTrue ? ' Completed' : ' Open')
-              : (note.subnotes.every(subnote => subnote.isTrue) ? ' Completed' : ' Open')
-            }
+    <article className='note-card'>
+      <header className='note-card__header'>
+        <div className='note-card__title-block'>
+          <p className='note-card__eyebrow'>Note</p>
+          <h3 className='note-card__title'>{note.content}</h3>
+        </div>
+        <span className={`note-status ${isCompleted ? 'note-status--completed' : 'note-status--open'}`}>
+          {isCompleted ? 'Completed' : 'Open'}
+        </span>
+      </header>
+
+      <div className='note-card__toolbar'>
+        <div className='note-card__metadata'>
+          <span>Created {new Date(note.createdAt).toLocaleString()}</span>
+          <span>Updated {new Date(note.updatedAt).toLocaleString()}</span>
+          <span className={note.alarmTime && new Date(note.alarmTime) < new Date() && !isCompleted ? 'note-card__alarm note-card__alarm--overdue' : 'note-card__alarm'}>
+            {note.alarmTime && new Date(note.alarmTime) < new Date() && !isCompleted && <AlertIcon />}
+            Alarm {note.alarmTime ? new Date(note.alarmTime).toLocaleString() : 'not set'}
           </span>
-        </article>
-
-        <section className='subnote-head'>
-          <section className='subnote-times'>
-            <p className='small-text note-info-row'>Created at: {new Date(note.createdAt).toLocaleString()}</p>
-            <p className='small-text note-info-row'>Last updated at: {new Date(note.updatedAt).toLocaleString()}</p>
-            <p className="note-info-row">
-              {note.alarmTime && new Date(note.alarmTime) < new Date() && (
-                <span className='text-warning'> <AlertIcon /> </span>
-              )}
-              Alarm Time: {note.alarmTime ? new Date(note.alarmTime).toLocaleString() : 'Not set'}
-            </p>
-          </section>
-
+        </div>
           <div className='button-group note-action-group'>
             <button onClick={() => onOpenAlarmTimeModal(note._id)} className='default-button'>Set alarm</button>
             <button onClick={() => onOpenConfirmModal(note._id)} className='delete-button'>Delete note <DeleteIcon /></button>
           </div>
-        </section>
+      </div>
 
-        <table className='subnote-table'>
-          <thead>
-            <tr>
-              <th>Content / {note.subnotes.length} subnotes</th>
-              <th>Created At</th>
-              <th>Last Updated At</th>
-              <th>Status</th>
-              <th>Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            {note.subnotes.map(subnote => (
-              <tr key={subnote._id}>
-                <td className="truncate" title={subnote.content}>
-                  {subnote.content.length > 20 ? `${subnote.content.substring(0, 20)}...` : subnote.content}
-                </td>
-                <td>{new Date(subnote.createdAt).toLocaleString()}</td>
-                <td>{new Date(subnote.updatedAt).toLocaleString()}</td>
-                <td>{subnote.isTrue ? 'Completed' : 'Open'}</td>
-                <td className="table-action-cell">
-                  <div className='button-group table-action-group'>
-                    <button onClick={() => onOpenSubnoteEditModal(note._id, subnote._id)} className='edit-link-button'><EditIcon /></button>
-                    <button onClick={() => onSubnoteDelete(note._id, subnote._id)} className='delete-link-button'><DeleteIcon /></button>
-                  </div>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-        <p className='small-text'>When all subnotes are done, Note is completed.</p>
-      </article>
+      <section className='note-card__subnotes' aria-label='Subnotes'>
+        <div className='note-card__section-heading'>
+          <h4>Subnotes</h4>
+          <span>{note.subnotes.length}</span>
+        </div>
+        {note.subnotes.length > 0 ? (
+          <div className='note-card__table-wrap'>
+            <table className='subnote-table'>
+              <thead>
+                <tr>
+                  <th>Content</th>
+                  <th>Created</th>
+                  <th>Updated</th>
+                  <th>Status</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                {note.subnotes.map(subnote => (
+                  <tr key={subnote._id}>
+                    <td className="truncate" title={subnote.content}>{subnote.content}</td>
+                    <td>{new Date(subnote.createdAt).toLocaleString()}</td>
+                    <td>{new Date(subnote.updatedAt).toLocaleString()}</td>
+                    <td>
+                      <span className={`note-status ${subnote.isTrue ? 'note-status--completed' : 'note-status--open'}`}>
+                        {subnote.isTrue ? 'Completed' : 'Open'}
+                      </span>
+                    </td>
+                    <td className="table-action-cell">
+                      <div className='button-group table-action-group'>
+                        <button aria-label='Edit subnote' onClick={() => onOpenSubnoteEditModal(note._id, subnote._id)} className='edit-link-button'><EditIcon /></button>
+                        <button aria-label='Delete subnote' onClick={() => onSubnoteDelete(note._id, subnote._id)} className='delete-link-button'><DeleteIcon /></button>
+                      </div>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        ) : (
+          <p className='note-card__empty'>No subnotes yet.</p>
+        )}
+        <p className='small-text'>The note is completed when all its subnotes are completed.</p>
+      </section>
 
       <SubnoteForm noteId={note._id} onSubnoteAdded={onSubnoteAdded} />
-    </div>
+    </article>
   );
 }
 

@@ -253,17 +253,19 @@ const handleInput = (e) => {
           <NoteSorter originalNotes={originalNotes} setNotes={setNotes} />
         </section>
 
-        {notes.map(note => (
-          <NoteCard
-            key={note._id}
-            note={note}
-            onOpenAlarmTimeModal={openAlarmTimeModal}
-            onOpenConfirmModal={openConfirmModal}
-            onOpenSubnoteEditModal={handleOpenSubnoteEditModal}
-            onSubnoteDelete={handleSubnoteDelete}
-            onSubnoteAdded={handleSubnoteAdded}
-          />
-        ))}
+        <section className="notes-stack" aria-label="Property notes">
+          {notes.map(note => (
+            <NoteCard
+              key={note._id}
+              note={note}
+              onOpenAlarmTimeModal={openAlarmTimeModal}
+              onOpenConfirmModal={openConfirmModal}
+              onOpenSubnoteEditModal={handleOpenSubnoteEditModal}
+              onSubnoteDelete={handleSubnoteDelete}
+              onSubnoteAdded={handleSubnoteAdded}
+            />
+          ))}
+        </section>
 
         <Modal
           isOpen={confirmModalIsOpen}

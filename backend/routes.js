@@ -161,38 +161,58 @@ router.get('/api/notes/:noteId/subnotes/:subnoteId', (req, res) => {
 });
 
 // Add a subnote to a note
-router.post('/api/notes/:id/subnotes', (req, res) => {
-  Note.findById(req.params.id)
-    .then(note => {
+router.post('/api/notes/:id/subnotes', async (req, res) => {
+  const content = typeof req.body.content === 'string' ? req.body.content.trim() : '';
+  if (content.length < 5 || content.length > 1000) {
+    return res.status(400).json({ error: 'Subnote content must be between 5 and 1000 characters.' });
+  }
+
+  try {
+    const note = await Note.findById(req.params.id);
+    if (!note) {
+      return res.status(404).json({ error: 'Note not found.' });
+    }
+
       note.subnotes.push({
-        content: req.body.content,
+        content,
         isTrue: req.body.isTrue,
         timestamp: new Date(),
       });
-      return note.save();
-    })
-    .then(() => res.json('Subnote added!'))
-    .catch(err => {
-      console.error(err);
-      res.status(400).json('Error: ' + err);
-    });
+    await note.save();
+    return res.json('Subnote added!');
+  } catch (err) {
+    console.error(err);
+    return res.status(400).json({ error: 'Subnote could not be added.' });
+  }
 });
 
 // Update a subnote of a note
-router.put('/api/notes/:noteId/subnotes/:subnoteId', (req, res) => {
-  Note.findById(req.params.noteId)
-    .then(note => {
-      const subnote = note.subnotes.id(req.params.subnoteId);
-      subnote.content = req.body.content;
-      subnote.isTrue = req.body.isTrue;
-      subnote.timestamp = new Date();
-      return note.save();
-    })
-    .then(() => res.json('Subnote updated!'))
-    .catch(err => {
-      console.error(err);
-      res.status(400).json('Error: ' + err);
-    });
+router.put('/api/notes/:noteId/subnotes/:subnoteId', async (req, res) => {
+  const content = typeof req.body.content === 'string' ? req.body.content.trim() : '';
+  if (content.length < 5 || content.length > 1000) {
+    return res.status(400).json({ error: 'Subnote content must be between 5 and 1000 characters.' });
+  }
+
+  try {
+    const note = await Note.findById(req.params.noteId);
+    if (!note) {
+      return res.status(404).json({ error: 'Note not found.' });
+    }
+
+    const subnote = note.subnotes.id(req.params.subnoteId);
+    if (!subnote) {
+      return res.status(404).json({ error: 'Subnote not found.' });
+    }
+
+    subnote.content = content;
+    subnote.isTrue = req.body.isTrue;
+    subnote.timestamp = new Date();
+    await note.save();
+    return res.json('Subnote updated!');
+  } catch (err) {
+    console.error(err);
+    return res.status(400).json({ error: 'Subnote could not be updated.' });
+  }
 });
 
 // Delete a subnote of a note

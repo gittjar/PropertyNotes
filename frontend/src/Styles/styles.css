@@ -246,6 +246,22 @@ textarea {
   resize: vertical;
 }
 
+.subnote-form__meta {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  margin-top: 5px;
+  color: var(--muted);
+  font-size: 0.75rem;
+}
+
+.form-error {
+  margin: 8px 0 0;
+  color: #b42318;
+  font-size: 0.82rem;
+  font-weight: 650;
+}
+
 textarea:focus,
 input:focus {
   outline: 2px solid rgba(29, 78, 216, 0.16);

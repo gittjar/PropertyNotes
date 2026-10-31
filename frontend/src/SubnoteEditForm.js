@@ -7,6 +7,7 @@ import './Styles/buttons.css';
 
 function SubnoteEditForm({ noteId, subnoteId, onSubnoteUpdated }) {
     const [updatedSubnote, setUpdatedSubnote] = useState({});
+    const [errorMessage, setErrorMessage] = useState('');
 
     useEffect(() => {
         // Check if noteId and subnoteId are defined and valid
@@ -24,6 +25,9 @@ function SubnoteEditForm({ noteId, subnoteId, onSubnoteUpdated }) {
 
     const handleSubnoteChange = (event) => {
         const value = event.target.type === 'checkbox' ? event.target.checked : event.target.value;
+        if (event.target.name === 'content') {
+            setErrorMessage('');
+        }
         setUpdatedSubnote({
             ...updatedSubnote,
             [event.target.name]: value,
@@ -32,6 +36,12 @@ function SubnoteEditForm({ noteId, subnoteId, onSubnoteUpdated }) {
 
     const handleUpdateSubnote = (event) => {
         event.preventDefault();
+
+        const content = (updatedSubnote.content || '').trim();
+        if (content.length < 5 || content.length > 1000) {
+            setErrorMessage('Subnote must be between 5 and 1000 characters.');
+            return;
+        }
     
         // Check if noteId and subnoteId are defined and valid
         if (!noteId || !subnoteId || noteId.length !== 24 || subnoteId.length !== 24) {
@@ -42,13 +52,16 @@ function SubnoteEditForm({ noteId, subnoteId, onSubnoteUpdated }) {
         // Convert isTrue to boolean
         const updatedData = {
             ...updatedSubnote,
+            content,
             isTrue: updatedSubnote.isTrue === 'true' || updatedSubnote.isTrue === true,
         };
     
         axios.put(`${API_BASE_URL}/api/notes/${noteId}/subnotes/${subnoteId}`, updatedData)
             .then(response => {
-                console.log(response.data);
                 onSubnoteUpdated(noteId, subnoteId, updatedData.isTrue);
+            })
+            .catch(error => {
+                setErrorMessage(error.response?.data?.error || 'Subnote could not be updated. Please try again.');
             });
     };
 
@@ -60,7 +73,16 @@ function SubnoteEditForm({ noteId, subnoteId, onSubnoteUpdated }) {
                     value={updatedSubnote.content || ''}
                     onChange={handleSubnoteChange}
                     placeholder="Subnote content"
+                    minLength={5}
+                    maxLength={1000}
+                    required
+                    aria-describedby="subnote-edit-hint subnote-edit-error"
                 />
+                <div className="subnote-form__meta">
+                    <span id="subnote-edit-hint">5–1000 characters</span>
+                    <span>{(updatedSubnote.content || '').length}/1000</span>
+                </div>
+                {errorMessage && <p id="subnote-edit-error" className="form-error" role="alert">{errorMessage}</p>}
             </div>
 
             <div className="subnote-edit-form__row">

@@ -10,8 +10,10 @@ const CheckIcon = () => <span className="success-mark" aria-hidden="true">✓</s
 function SubnoteForm({ noteId, onSubnoteAdded }) {
   const [newSubnote, setNewSubnote] = useState({ content: '' });
   const [showNotification, setShowNotification] = useState(false);
+  const [errorMessage, setErrorMessage] = useState('');
 
   const handleSubnoteChange = (event) => {
+    setErrorMessage('');
     setNewSubnote({
       ...newSubnote,
       [event.target.name]: event.target.value,
@@ -20,25 +22,49 @@ function SubnoteForm({ noteId, onSubnoteAdded }) {
 
   const handleAddSubnote = (event) => {
     event.preventDefault();
-    axios.post(`${API_BASE_URL}/api/notes/${noteId}/subnotes`, newSubnote)
+    const content = newSubnote.content.trim();
+
+    if (content.length < 5 || content.length > 1000) {
+      setErrorMessage('Subnote must be between 5 and 1000 characters.');
+      return;
+    }
+
+    axios.post(`${API_BASE_URL}/api/notes/${noteId}/subnotes`, { ...newSubnote, content })
       .then(response => {
-        console.log(response.data);
         onSubnoteAdded(response.data);
 
         setNewSubnote({ content: '' });
+        setErrorMessage('');
 
         // Show notification
         setShowNotification(true);
         setTimeout(() => {
           setShowNotification(false);
         }, 3000); // Hide after 3 seconds
+      })
+      .catch(error => {
+        setErrorMessage(error.response?.data?.error || 'Subnote could not be added. Please try again.');
       });
   };
 
   return (
     <div>
       <form onSubmit={handleAddSubnote}>
-        <textarea name="content" value={newSubnote.content} onChange={handleSubnoteChange} placeholder="Subnote content" />
+        <textarea
+          name="content"
+          value={newSubnote.content}
+          onChange={handleSubnoteChange}
+          placeholder="Subnote content"
+          minLength={5}
+          maxLength={1000}
+          required
+          aria-describedby="subnote-content-hint subnote-content-error"
+        />
+        <div className="subnote-form__meta">
+          <span id="subnote-content-hint">5–1000 characters</span>
+          <span>{newSubnote.content.length}/1000</span>
+        </div>
+        {errorMessage && <p id="subnote-content-error" className="form-error" role="alert">{errorMessage}</p>}
         <div className="button-group form-button-group">
           <button type="submit" className='add-button'>Add Subnote</button>
         </div>

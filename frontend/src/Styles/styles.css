@@ -745,6 +745,37 @@ input:focus {
   color: #991b1b;
 }
 
+.dashboard-success-toast {
+  width: min(680px, calc(100vw - 32px));
+  justify-content: flex-start;
+  padding-bottom: 16px;
+}
+
+.dashboard-success-toast__message {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+.dashboard-success-toast__countdown {
+  flex: 0 0 auto;
+  min-width: 34px;
+  padding: 4px 7px;
+  border: 1px solid rgba(22, 101, 52, 0.18);
+  border-radius: 999px;
+  background: rgba(22, 101, 52, 0.07);
+  font-variant-numeric: tabular-nums;
+  text-align: center;
+}
+
+.dashboard-success-toast__progress {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  height: 3px;
+  background: #16a34a;
+  transition: width 0.1s linear;
+}
+
 .modal-actions {
   display: flex;
   flex-wrap: wrap;

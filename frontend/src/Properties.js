@@ -25,7 +25,24 @@ function Properties() {
   const [isPropertyFormModalOpen, setIsPropertyFormModalOpen] = useState(false);
   const [sortOrder, setSortOrder] = useState('asc');
   const [loading, setLoading] = useState(true); // Add loading state
-  const [showNotification, setShowNotification] = useState(false);
+  const [successNotification, setSuccessNotification] = useState(null);
+  const [notificationSeconds, setNotificationSeconds] = useState(0);
+
+  useEffect(() => {
+    if (!successNotification) return undefined;
+
+    const updateCountdown = () => {
+      const secondsLeft = Math.max(0, Math.ceil((successNotification.expiresAt - Date.now()) / 1000));
+      setNotificationSeconds(secondsLeft);
+      if (secondsLeft === 0) {
+        setSuccessNotification(null);
+      }
+    };
+
+    updateCountdown();
+    const intervalId = setInterval(updateCountdown, 100);
+    return () => clearInterval(intervalId);
+  }, [successNotification]);
 
   const handleOpenModal = (id) => {
     setModalPropertyId(id);
@@ -80,28 +97,35 @@ function Properties() {
     setPropertyAdded(false); // Reset the flag after fetching properties
   }, [propertyAdded]); // Re-fetch properties when propertyAdded changes
   
-  const handleNoteAdded = (propertyId, newNote) => {
-    setProperties(prevProperties => {
-      return prevProperties.map(property => {
-        if (property._id === propertyId) {
-          return {
-            ...property,
-            notes: [...property.notes, newNote]
-          };
-        } else {
-          return property;
-        }
-      });
+  const handleNoteAdded = (propertyId, noteContent) => {
+    const propertyName = properties.find(property => property._id === propertyId)?.propertyName || 'Property';
+    setSuccessNotification({
+      type: 'note',
+      propertyName,
+      noteContent,
+      expiresAt: Date.now() + 5000,
     });
+
+    axios.get(`${API_BASE_URL}/api/properties/${propertyId}/notes`)
+      .then(response => {
+        setProperties(prevProperties => prevProperties.map(property => (
+          property._id === propertyId
+            ? { ...property, notes: response.data }
+            : property
+        )));
+      })
+      .catch(error => console.error('Could not refresh property notes:', error));
+
     handleCloseModal();
   };
 
   const handlePropertyAdded = (newProperty) => {
     setPropertyAdded(true); // Trigger useEffect to re-fetch properties
-    setShowNotification(true); // Show notification
-    setTimeout(() => {
-      setShowNotification(false); // Hide notification after 5 seconds
-    }, 5000);
+    setSuccessNotification({
+      type: 'property',
+      propertyName: newProperty.propertyName,
+      expiresAt: Date.now() + 5000,
+    });
     // Add the new property to the properties state
     setProperties(prevProperties => [
       ...prevProperties, 
@@ -213,10 +237,24 @@ function Properties() {
           </tbody>
         </table>
 
-        {showNotification && (
-          <div className="notification-success show">
+        {successNotification && (
+          <div className="notification-success show dashboard-success-toast" role="status" aria-live="polite">
             <CheckIcon />
-            <span>New property: {properties[properties.length - 1]?.propertyName} was created successfully.</span>
+            <span className="dashboard-success-toast__message">
+              {successNotification.type === 'note' ? (
+                <>
+                  Note <strong>“{successNotification.noteContent}”</strong> added to <strong>{successNotification.propertyName}</strong>.
+                </>
+              ) : (
+                <>
+                  Property <strong>{successNotification.propertyName}</strong> was created successfully.
+                </>
+              )}
+            </span>
+            <span className="dashboard-success-toast__countdown" aria-label={`${notificationSeconds} seconds remaining`}>
+              {notificationSeconds}s
+            </span>
+            <span className="dashboard-success-toast__progress" style={{ width: `${notificationSeconds * 20}%` }} />
           </div>
         )}
 
@@ -230,7 +268,8 @@ function Properties() {
           <NoteForm 
             propertyId={modalPropertyId} 
             propertyName={properties.find(property => property._id === modalPropertyId)?.propertyName} 
-            onNoteAdded={(newNote) => handleNoteAdded(modalPropertyId, newNote)} 
+            onNoteAdded={(noteContent) => handleNoteAdded(modalPropertyId, noteContent)}
+            showInlineSuccess={false}
           />
           <button onClick={handleCloseModal} className='default-button'>Close Note</button>
         </Modal>

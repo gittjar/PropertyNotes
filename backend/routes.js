@@ -56,14 +56,18 @@ router.delete('/api/properties/:id', (req, res) => {
 // Add a note to a property
 router.post('/api/properties/:id/notes', (req, res) => {
   const propertyId = req.params.id;
+  const content = typeof req.body.content === 'string' ? req.body.content.trim() : '';
   const alarmDays = req.body.alarmDays || 7; // Default to 7 if not provided
 
   if (!mongoose.Types.ObjectId.isValid(propertyId)) {
     return res.status(400).json({ error: 'Invalid property ID' });
   }
+  if (content.length < 5 || content.length > 100) {
+    return res.status(400).json({ error: 'Note content must be between 5 and 100 characters.' });
+  }
 
   const newNote = new Note({
-    content: req.body.content,
+    content,
     isTrue: req.body.isTrue,
     property: propertyId,
     alarmTime: new Date(Date.now() + alarmDays * 24 * 60 * 60 * 1000) // Current time + alarmDays days
@@ -89,6 +93,14 @@ router.get('/api/properties/:id/notes', (req, res) => {
 
 // Update a note by ID
 router.put('/api/notes/:id', (req, res) => {
+  if (req.body.content !== undefined) {
+    const content = typeof req.body.content === 'string' ? req.body.content.trim() : '';
+    if (content.length < 5 || content.length > 100) {
+      return res.status(400).json({ error: 'Note content must be between 5 and 100 characters.' });
+    }
+    req.body.content = content;
+  }
+
   Note.findById(req.params.id)
     .then(note => {
       if (req.body.content !== undefined) {

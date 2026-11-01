@@ -4,6 +4,8 @@ import { Link } from 'react-router-dom';
 import Modal from 'react-modal';
 import NoteForm from './NoteForm';
 import PropertyForm from './PropertyForm';
+import SuccessNotification from './components/SuccessNotification';
+import useSuccessNotification from './hooks/useSuccessNotification';
 import { API_BASE_URL } from './config';
 import { getOpenNotesCount, getCompletedNotesCount } from './utils/propertyUtils';
 import './Styles/styles.css';
@@ -16,7 +18,6 @@ Modal.setAppElement('#root');
 const ArrowIcon = () => <span aria-hidden="true">↗</span>;
 const SortIcon = () => <span aria-hidden="true">⇅</span>;
 const WarningIcon = () => <span className="warning-mark" aria-hidden="true">⚠</span>;
-const CheckIcon = () => <span className="success-mark" aria-hidden="true">✓</span>;
 
 function Properties() {
   const [properties, setProperties] = useState([]);
@@ -25,24 +26,7 @@ function Properties() {
   const [isPropertyFormModalOpen, setIsPropertyFormModalOpen] = useState(false);
   const [sortOrder, setSortOrder] = useState('asc');
   const [loading, setLoading] = useState(true); // Add loading state
-  const [successNotification, setSuccessNotification] = useState(null);
-  const [notificationSeconds, setNotificationSeconds] = useState(0);
-
-  useEffect(() => {
-    if (!successNotification) return undefined;
-
-    const updateCountdown = () => {
-      const secondsLeft = Math.max(0, Math.ceil((successNotification.expiresAt - Date.now()) / 1000));
-      setNotificationSeconds(secondsLeft);
-      if (secondsLeft === 0) {
-        setSuccessNotification(null);
-      }
-    };
-
-    updateCountdown();
-    const intervalId = setInterval(updateCountdown, 100);
-    return () => clearInterval(intervalId);
-  }, [successNotification]);
+  const { notification, secondsRemaining, showSuccessNotification } = useSuccessNotification();
 
   const handleOpenModal = (id) => {
     setModalPropertyId(id);
@@ -99,11 +83,10 @@ function Properties() {
   
   const handleNoteAdded = (propertyId, noteContent) => {
     const propertyName = properties.find(property => property._id === propertyId)?.propertyName || 'Property';
-    setSuccessNotification({
+    showSuccessNotification({
       type: 'note',
       propertyName,
       noteContent,
-      expiresAt: Date.now() + 5000,
     });
 
     axios.get(`${API_BASE_URL}/api/properties/${propertyId}/notes`)
@@ -121,10 +104,9 @@ function Properties() {
 
   const handlePropertyAdded = (newProperty) => {
     setPropertyAdded(true); // Trigger useEffect to re-fetch properties
-    setSuccessNotification({
+    showSuccessNotification({
       type: 'property',
       propertyName: newProperty.propertyName,
-      expiresAt: Date.now() + 5000,
     });
     // Add the new property to the properties state
     setProperties(prevProperties => [
@@ -237,26 +219,7 @@ function Properties() {
           </tbody>
         </table>
 
-        {successNotification && (
-          <div className="notification-success show dashboard-success-toast" role="status" aria-live="polite">
-            <CheckIcon />
-            <span className="dashboard-success-toast__message">
-              {successNotification.type === 'note' ? (
-                <>
-                  Note <strong>“{successNotification.noteContent}”</strong> added to <strong>{successNotification.propertyName}</strong>.
-                </>
-              ) : (
-                <>
-                  Property <strong>{successNotification.propertyName}</strong> was created successfully.
-                </>
-              )}
-            </span>
-            <span className="dashboard-success-toast__countdown" aria-label={`${notificationSeconds} seconds remaining`}>
-              {notificationSeconds}s
-            </span>
-            <span className="dashboard-success-toast__progress" style={{ width: `${notificationSeconds * 20}%` }} />
-          </div>
-        )}
+        <SuccessNotification notification={notification} secondsRemaining={secondsRemaining} />
 
         <Modal
           isOpen={modalPropertyId !== null}

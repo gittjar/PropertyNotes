@@ -7,6 +7,8 @@ import SubnoteEditForm from './SubnoteEditForm';
 import PropertySummaryCard from './components/PropertySummaryCard';
 import NoteCard from './components/NoteCard';
 import NoteSorter from './NoteSorter';
+import SuccessNotification from './components/SuccessNotification';
+import useSuccessNotification from './hooks/useSuccessNotification';
 import { getOpenNotesCount, getCompletedNotesCount, getAlertNotesCount, isValidDate, formatDateForInput } from './utils/propertyUtils';
 import './Styles/buttons.css';
 import './Styles/styles.css';
@@ -50,6 +52,7 @@ function PropertyDetails(){
   const [modalPropertyId, setModalPropertyId] = useState(null);
   const [showNotificationWarning, setShowNotificationWarning] = useState(false);
   const [originalNotes, setOriginalNotes] = useState([]);
+  const { notification, secondsRemaining, showSuccessNotification } = useSuccessNotification();
 
   useEffect(() => {
     axios.get(`${API_BASE_URL}/api/properties/${id}`)
@@ -78,7 +81,13 @@ function PropertyDetails(){
     navigate(-1);
   };
 
-  const handleNoteAdded = () => {
+  const handleNoteAdded = (noteContent) => {
+    showSuccessNotification({
+      type: 'note',
+      propertyName: property.propertyName,
+      noteContent,
+    });
+
     fetchNotesWithSubnotes().then(notesWithSubnotes => {
       setNotes(notesWithSubnotes);
       setOriginalNotes(notesWithSubnotes);
@@ -249,6 +258,8 @@ const handleInput = (e) => {
           showNotificationWarning={showNotificationWarning}
         />
 
+        <SuccessNotification notification={notification} secondsRemaining={secondsRemaining} />
+
         <section className='notes-sort-section'>
           <NoteSorter originalNotes={originalNotes} setNotes={setNotes} />
         </section>
@@ -351,7 +362,12 @@ const handleInput = (e) => {
           overlayClassName="ReactModal__Overlay"
           className="ReactModal__Content"
         >
-          <NoteForm propertyId={modalPropertyId} onNoteAdded={handleNoteAdded} />
+          <NoteForm
+            propertyId={modalPropertyId}
+            propertyName={property.propertyName}
+            onNoteAdded={handleNoteAdded}
+            showInlineSuccess={false}
+          />
           <button onClick={handleCloseModal} className='default-button'>Close Note</button>
         </Modal>
       </section>

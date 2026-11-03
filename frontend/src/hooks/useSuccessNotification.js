@@ -8,12 +8,15 @@ function useSuccessNotification() {
 
   useEffect(() => {
     if (!notification) return undefined;
+    let hasExpired = false;
 
     const updateCountdown = () => {
       const remaining = Math.max(0, Math.ceil((notification.expiresAt - Date.now()) / 1000));
       setSecondsRemaining(remaining);
-      if (remaining === 0) {
-        setNotification(null);
+      if (remaining === 0 && !hasExpired) {
+        hasExpired = true;
+        setNotification(current => current === notification ? null : current);
+        notification.onExpire?.();
       }
     };
 
@@ -23,8 +26,10 @@ function useSuccessNotification() {
   }, [notification]);
 
   const showSuccessNotification = (details) => {
-    setSecondsRemaining(5);
-    setNotification({ ...details, expiresAt: Date.now() + NOTIFICATION_DURATION_MS });
+    const durationMs = details.durationMs || NOTIFICATION_DURATION_MS;
+    const durationSeconds = Math.ceil(durationMs / 1000);
+    setSecondsRemaining(durationSeconds);
+    setNotification({ ...details, durationSeconds, expiresAt: Date.now() + durationMs });
   };
 
   const dismissNotification = () => {

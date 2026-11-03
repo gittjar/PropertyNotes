@@ -38,8 +38,12 @@ function SubnoteEditForm({ noteId, subnoteId, onSubnoteUpdated }) {
         event.preventDefault();
 
         const content = (updatedSubnote.content || '').trim();
+        if (!content) {
+            setErrorMessage('Add a detail or next step before saving.');
+            return;
+        }
         if (content.length < 5 || content.length > 1000) {
-            setErrorMessage('Subnote must be between 5 and 1000 characters.');
+            setErrorMessage('Please use 5–1000 characters for this detail.');
             return;
         }
     
@@ -66,16 +70,17 @@ function SubnoteEditForm({ noteId, subnoteId, onSubnoteUpdated }) {
     };
 
     return (
-        <form onSubmit={handleUpdateSubnote} className="subnote-edit-form">
+        <form onSubmit={handleUpdateSubnote} className="subnote-edit-form" noValidate>
             <div className="subnote-edit-form__field">
+                <label className="form-hint" htmlFor="subnote-edit-content">Update this detail or next step</label>
                 <textarea
+                    id="subnote-edit-content"
                     name="content"
                     value={updatedSubnote.content || ''}
                     onChange={handleSubnoteChange}
-                    placeholder="Subnote content"
+                    placeholder="Describe the latest progress or what happens next"
                     minLength={5}
                     maxLength={1000}
-                    required
                     aria-describedby="subnote-edit-hint subnote-edit-error"
                 />
                 <div className="subnote-form__meta">

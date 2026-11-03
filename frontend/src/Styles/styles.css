@@ -262,6 +262,21 @@ textarea {
   font-weight: 650;
 }
 
+.form-hint {
+  display: block;
+  margin: 8px 0 6px;
+  color: var(--muted);
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+
+.form-feedback {
+  margin: 12px 0 0;
+  color: var(--primary);
+  font-size: 0.9rem;
+  text-align: center;
+}
+
 textarea:focus,
 input:focus {
   outline: 2px solid rgba(29, 78, 216, 0.16);
@@ -774,6 +789,32 @@ input:focus {
   height: 3px;
   background: #16a34a;
   transition: width 0.1s linear;
+}
+
+.dashboard-success-toast--pending {
+  padding-right: 12px;
+}
+
+.dashboard-success-toast--pending .dashboard-success-toast__progress {
+  background: #dc2626;
+}
+
+.dashboard-success-toast__undo {
+  flex: 0 0 auto;
+  min-height: 34px;
+  padding: 6px 12px;
+  border: 1px solid rgba(185, 28, 28, 0.25);
+  border-radius: 8px;
+  background: #fff;
+  color: #b91c1c;
+  cursor: pointer;
+  font: inherit;
+  font-size: 0.82rem;
+  font-weight: 750;
+}
+
+.dashboard-success-toast__undo:hover {
+  background: rgba(239, 68, 68, 0.08);
 }
 
 .modal-actions {

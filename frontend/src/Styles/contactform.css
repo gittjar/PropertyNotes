@@ -56,3 +56,13 @@
     margin-top: 1rem;
     color: #512685;
   }
+
+  .contact-form-container .form-hint {
+    margin: 0 0 0.4rem;
+    color: #512685;
+    text-align: left;
+  }
+
+  .contact-form-container .form-feedback {
+    color: #512685;
+  }

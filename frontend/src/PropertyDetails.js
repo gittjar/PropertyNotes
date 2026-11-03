@@ -52,7 +52,7 @@ function PropertyDetails(){
   const [modalPropertyId, setModalPropertyId] = useState(null);
   const [showNotificationWarning, setShowNotificationWarning] = useState(false);
   const [originalNotes, setOriginalNotes] = useState([]);
-  const { notification, secondsRemaining, showSuccessNotification } = useSuccessNotification();
+  const { notification, secondsRemaining, showSuccessNotification, dismissNotification } = useSuccessNotification();
 
   useEffect(() => {
     axios.get(`${API_BASE_URL}/api/properties/${id}`)
@@ -95,16 +95,49 @@ function PropertyDetails(){
     handleCloseModal();
   };
 
-  const handleNoteDelete = () => {
-    if (noteToDelete) {
-      axios.delete(`${API_BASE_URL}/api/notes/${noteToDelete}`)
-        .then(() => fetchNotesWithSubnotes())
-        .then(notesWithSubnotes => {
-          setNotes(notesWithSubnotes);
-          setOriginalNotes(notesWithSubnotes);
+  const deleteNote = (noteId, noteContent) => {
+    axios.delete(`${API_BASE_URL}/api/notes/${noteId}`)
+      .then(() => fetchNotesWithSubnotes())
+      .then(notesWithSubnotes => {
+        setNotes(notesWithSubnotes);
+        setOriginalNotes(notesWithSubnotes);
+        showSuccessNotification({
+          type: 'note-deleted',
+          propertyName: property.propertyName,
+          noteContent,
         });
+      })
+      .catch(error => {
+        console.error('Could not delete note:', error);
+        showSuccessNotification({
+          type: 'delete-error',
+          propertyName: property.propertyName,
+          noteContent,
+        });
+      });
+  };
+
+  const handleNoteDelete = () => {
+    const selectedNote = notes.find(note => note._id === noteToDelete);
+    if (selectedNote) {
+      const noteId = selectedNote._id;
+      const noteContent = selectedNote.content;
+      showSuccessNotification({
+        type: 'delete-pending',
+        propertyName: property.propertyName,
+        noteContent,
+        durationMs: 10000,
+        onExpire: () => deleteNote(noteId, noteContent),
+        onUndo: () => showSuccessNotification({
+          type: 'delete-undone',
+          propertyName: property.propertyName,
+          noteContent,
+        }),
+        onDismiss: dismissNotification,
+      });
     }
     setConfirmModalIsOpen(false);
+    setNoteToDelete(null);
   };
   
   const openConfirmModal = (noteId) => {

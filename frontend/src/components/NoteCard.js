@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import SubnoteForm from '../SubnoteForm';
 
 const EditIcon = () => <span aria-hidden="true">✎</span>;
@@ -13,7 +13,53 @@ function NoteCard({
   onSubnoteDelete,
   onSubnoteAdded,
 }) {
+  const [subnoteSort, setSubnoteSort] = useState({ key: 'createdAt', direction: 'desc' });
   const subnotes = Array.isArray(note.subnotes) ? note.subnotes : [];
+  const sortedSubnotes = [...subnotes].sort((first, second) => {
+    let comparison = 0;
+    if (subnoteSort.key === 'content') {
+      comparison = (first.content || '').localeCompare(second.content || '', undefined, {
+        numeric: true,
+        sensitivity: 'base',
+      });
+    } else if (subnoteSort.key === 'isTrue') {
+      comparison = Number(Boolean(first.isTrue)) - Number(Boolean(second.isTrue));
+    } else {
+      const firstDate = new Date(first[subnoteSort.key]).getTime();
+      const secondDate = new Date(second[subnoteSort.key]).getTime();
+      comparison = (Number.isNaN(firstDate) ? 0 : firstDate) - (Number.isNaN(secondDate) ? 0 : secondDate);
+    }
+
+    return subnoteSort.direction === 'asc' ? comparison : -comparison;
+  });
+  const handleSubnoteSort = (key) => {
+    setSubnoteSort(current => ({
+      key,
+      direction: current.key === key
+        ? current.direction === 'asc' ? 'desc' : 'asc'
+        : key === 'createdAt' || key === 'updatedAt' ? 'desc' : 'asc',
+    }));
+  };
+  const renderSubnoteSortHeader = (key, label) => {
+    const isActive = subnoteSort.key === key;
+    const ariaSort = isActive
+      ? subnoteSort.direction === 'asc' ? 'ascending' : 'descending'
+      : 'none';
+
+    return (
+      <th aria-sort={ariaSort}>
+        <button
+          type="button"
+          className={`subnote-sort-button${isActive ? ' subnote-sort-button--active' : ''}`}
+          onClick={() => handleSubnoteSort(key)}
+          aria-label={`Sort by ${label}${isActive ? `, ${subnoteSort.direction === 'asc' ? 'ascending' : 'descending'}` : ''}`}
+        >
+          {label}
+          <span aria-hidden="true">{isActive ? subnoteSort.direction === 'asc' ? '↑' : '↓' : '↕'}</span>
+        </button>
+      </th>
+    );
+  };
   const isCompleted = subnotes.length === 0
     ? note.isTrue
     : subnotes.every(subnote => subnote.isTrue);
@@ -80,15 +126,15 @@ function NoteCard({
             <table className='subnote-table'>
               <thead>
                 <tr>
-                  <th>Content</th>
-                  <th>Created</th>
-                  <th>Updated</th>
-                  <th>Status</th>
+                  {renderSubnoteSortHeader('content', 'Name')}
+                  {renderSubnoteSortHeader('createdAt', 'Time')}
+                  {renderSubnoteSortHeader('updatedAt', 'Updated')}
+                  {renderSubnoteSortHeader('isTrue', 'Status')}
                   <th>Actions</th>
                 </tr>
               </thead>
               <tbody>
-                {subnotes.map(subnote => (
+                {sortedSubnotes.map(subnote => (
                   <tr key={subnote._id}>
                     <td className="truncate" title={subnote.content}>{subnote.content}</td>
                     <td>{new Date(subnote.createdAt).toLocaleString()}</td>

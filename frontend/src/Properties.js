@@ -23,6 +23,7 @@ function Properties() {
   const [properties, setProperties] = useState([]);
   const [propertyAdded, setPropertyAdded] = useState(false); 
   const [modalPropertyId, setModalPropertyId] = useState(null);
+  const [quickViewPropertyId, setQuickViewPropertyId] = useState(null);
   const [isPropertyFormModalOpen, setIsPropertyFormModalOpen] = useState(false);
   const [sortOrder, setSortOrder] = useState('asc');
   const [loading, setLoading] = useState(true); // Add loading state
@@ -189,10 +190,81 @@ function Properties() {
               properties.map(property => (
                 <tr key={property._id}>
                   <td>
-                    <Link to={`/properties/${property._id}`} className="property-link">
-                      <span>{property.propertyName}</span>
-                      <ArrowIcon />
-                    </Link>
+                    <div
+                      className={`property-quick-view${quickViewPropertyId === property._id ? ' property-quick-view--pinned' : ''}`}
+                      onKeyDown={event => {
+                        if (event.key === 'Escape') {
+                          setQuickViewPropertyId(null);
+                        }
+                      }}
+                    >
+                      <Link to={`/properties/${property._id}`} className="property-link">
+                        <span>{property.propertyName}</span>
+                        <ArrowIcon />
+                      </Link>
+                      <button
+                        type="button"
+                        className="property-quick-view__trigger"
+                        aria-label={`Quick view notes for ${property.propertyName}`}
+                        aria-expanded={quickViewPropertyId === property._id}
+                        onClick={() => setQuickViewPropertyId(currentId => (
+                          currentId === property._id ? null : property._id
+                        ))}
+                      >
+                        Quick view
+                      </button>
+                      <div className={`property-quick-view__panel${quickViewPropertyId === property._id ? ' property-quick-view__panel--pinned' : ''}`}>
+                        <div className="property-quick-view__heading">
+                          <div>
+                            <strong>{property.propertyName}</strong>
+                            <span>{getOpenNotesCount(property.notes || [])} open · {property.notes?.length || 0} total</span>
+                          </div>
+                          <button
+                            type="button"
+                            className="property-quick-view__close"
+                            aria-label="Close quick view"
+                            onClick={() => setQuickViewPropertyId(null)}
+                          >
+                            ×
+                          </button>
+                        </div>
+                        {property.notes?.length ? (
+                          <ul className="property-quick-view__notes">
+                            {[...property.notes]
+                              .sort((first, second) => new Date(second.updatedAt || second.createdAt || 0) - new Date(first.updatedAt || first.createdAt || 0))
+                              .slice(0, 5)
+                              .map(note => {
+                                const isOpen = !note.subnotes?.length
+                                  ? !note.isTrue
+                                  : !note.subnotes.every(subnote => subnote.isTrue);
+                                const alarmDate = note.alarmTime ? new Date(note.alarmTime) : null;
+                                const isOverdue = isOpen && alarmDate && !Number.isNaN(alarmDate.getTime()) && alarmDate < new Date();
+                                const updatedDate = note.updatedAt ? new Date(note.updatedAt) : null;
+
+                                return (
+                                  <li key={note._id}>
+                                    <div className="property-quick-view__note-main">
+                                      <span className="property-quick-view__note-content" title={note.content}>{note.content}</span>
+                                      <span className={`property-quick-view__status property-quick-view__status--${isOverdue ? 'overdue' : isOpen ? 'open' : 'completed'}`}>
+                                        {isOverdue ? 'Overdue' : isOpen ? 'Open' : 'Completed'}
+                                      </span>
+                                    </div>
+                                    <span className="property-quick-view__note-details">
+                                      {updatedDate && !Number.isNaN(updatedDate.getTime()) && `Updated ${updatedDate.toLocaleDateString()}`}
+                                      {alarmDate && !Number.isNaN(alarmDate.getTime()) && ` · Alarm ${alarmDate.toLocaleDateString()}`}
+                                    </span>
+                                  </li>
+                                );
+                              })}
+                          </ul>
+                        ) : (
+                          <p className="property-quick-view__empty">No notes yet. Add one to get started.</p>
+                        )}
+                        {property.notes?.length > 5 && (
+                          <span className="property-quick-view__more">Showing 5 most recently updated notes</span>
+                        )}
+                      </div>
+                    </div>
                   </td>
                   <td>
                     {property.alarm && <span className="text-warning"><WarningIcon /> {property.pastAlarmsCount}</span>}

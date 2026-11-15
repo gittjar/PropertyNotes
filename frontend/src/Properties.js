@@ -178,11 +178,11 @@ function Properties() {
           <tbody>
             {loading ? (
               <tr>
-                <td colSpan="8">
-                <p>Loading data from database. Wait a moment ...</p>
-                <p>It can takes over 30 sec !</p>
-
-                  <div className="spinner">
+                <td colSpan="8" className="loading-cell">
+                  <div className="loading-state" role="status" aria-live="polite">
+                    <div className="spinner" aria-hidden="true" />
+                    <span>Loading ...</span>
+                    <span className="loading-state__hint">Fetching your properties and notes</span>
                   </div>
                 </td>
               </tr>

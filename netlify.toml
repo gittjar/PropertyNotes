@@ -3,6 +3,9 @@
   publish = "build"
   command = "npm install && npm run build"
 
+[build.environment]
+  NODE_VERSION = "26.13.1"
+
 [[redirects]]
   from = "/*"
   to = "/index.html"

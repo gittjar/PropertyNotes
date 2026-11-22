@@ -316,11 +316,13 @@ function Properties() {
           overlayClassName="ReactModal__Overlay"
           className="ReactModal__Content"
         >
-          <PropertyForm onPropertyAdded={(newProperty) => {
-            handlePropertyAdded(newProperty);
-            handleClosePropertyFormModal();
-          }} />
-          <button onClick={handleClosePropertyFormModal} className='default-button'>Close Form</button>
+          <PropertyForm
+            onPropertyAdded={(newProperty) => {
+              handlePropertyAdded(newProperty);
+              handleClosePropertyFormModal();
+            }}
+            onClose={handleClosePropertyFormModal}
+          />
         </Modal>
       </section>
     </div>

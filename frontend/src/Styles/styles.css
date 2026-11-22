@@ -443,6 +443,30 @@ textarea {
   font-weight: 600;
 }
 
+.property-form {
+  display: grid;
+  gap: 12px;
+}
+
+.property-form h3,
+.property-form .form-hint,
+.property-form .form-error {
+  margin-bottom: 0;
+}
+
+.property-form__actions {
+  display: flex;
+  width: 100%;
+}
+
+.property-form__actions .add-button {
+  flex: 1.75 1 0;
+}
+
+.property-form__actions .default-button {
+  flex: 1 1 0;
+}
+
 .form-feedback {
   margin: 12px 0 0;
   color: var(--primary);

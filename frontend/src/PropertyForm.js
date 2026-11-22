@@ -4,7 +4,7 @@ import { API_BASE_URL } from './config';
 import './Styles/styles.css';
 import './Styles/buttons.css'
 
-function PropertyForm({ onPropertyAdded }) {
+function PropertyForm({ onPropertyAdded, onClose }) {
   const [propertyName, setPropertyName] = useState('');
   const [address, setAddress] = useState('');
   const [city, setCity] = useState('');
@@ -39,18 +39,17 @@ function PropertyForm({ onPropertyAdded }) {
     };
 
   return (
-    <form onSubmit={handleSubmit} noValidate>
-      
-        <h3>Create new property</h3>
-        <label className="form-hint" htmlFor="property-name">Start with a name you will recognize</label>
-        <input id="property-name" type="text" value={propertyName} onChange={e => { setPropertyName(e.target.value); setErrorMessage(''); }} placeholder='For example: Summer cottage' aria-describedby="property-form-error" />
-        <br></br>
-        <input type="text" value={address} onChange={e => setAddress(e.target.value)} placeholder='Street address (optional)' aria-label="Street address (optional)" />
-        <br></br>
-        <input type="text" value={city} onChange={e => setCity(e.target.value)} placeholder='City (optional)' aria-label="City (optional)" />
-      <br></br>
+    <form onSubmit={handleSubmit} noValidate className="property-form">
+      <h3>Create new property</h3>
+      <label className="form-hint" htmlFor="property-name">Start with a name you will recognize</label>
+      <input id="property-name" type="text" value={propertyName} onChange={e => { setPropertyName(e.target.value); setErrorMessage(''); }} placeholder='For example: Summer cottage' aria-describedby="property-form-error" />
+      <input type="text" value={address} onChange={e => setAddress(e.target.value)} placeholder='Street address (optional)' aria-label="Street address (optional)" />
+      <input type="text" value={city} onChange={e => setCity(e.target.value)} placeholder='City (optional)' aria-label="City (optional)" />
       {errorMessage && <p id="property-form-error" className="form-error" role="alert">{errorMessage}</p>}
-      <button type="submit" className='add-button'>Add Property</button>
+      <div className="button-group property-form__actions">
+        <button type="submit" className="add-button">Add Property</button>
+        <button type="button" onClick={onClose} className="default-button">Close Form</button>
+      </div>
     </form>
   );
 }

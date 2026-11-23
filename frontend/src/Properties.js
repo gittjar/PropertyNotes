@@ -26,6 +26,7 @@ function Properties() {
   const [quickViewPropertyId, setQuickViewPropertyId] = useState(null);
   const [isPropertyFormModalOpen, setIsPropertyFormModalOpen] = useState(false);
   const [sortOrder, setSortOrder] = useState('asc');
+  const [nameSortOrder, setNameSortOrder] = useState(null);
   const [loading, setLoading] = useState(true); // Add loading state
   const { notification, secondsRemaining, showSuccessNotification } = useSuccessNotification();
 
@@ -143,6 +144,21 @@ function Properties() {
     setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc');
   };
 
+  const handleSortByName = () => {
+    const nextSortOrder = nameSortOrder === 'asc' ? 'desc' : 'asc';
+    const sortedProperties = [...properties].sort((first, second) => {
+      const comparison = (first.propertyName || '').localeCompare(
+        second.propertyName || '',
+        undefined,
+        { numeric: true, sensitivity: 'base' }
+      );
+      return nextSortOrder === 'asc' ? comparison : -comparison;
+    });
+
+    setProperties(sortedProperties);
+    setNameSortOrder(nextSortOrder);
+  };
+
   return (
     <div>
       <section className='property-main'>
@@ -162,7 +178,17 @@ function Properties() {
         <table className='property-table'>
           <thead>
             <tr>
-              <th>Property Name</th>
+              <th aria-sort={nameSortOrder ? nameSortOrder === 'asc' ? 'ascending' : 'descending' : 'none'}>
+                <button
+                  type="button"
+                  className="sort-header property-name-sort"
+                  onClick={handleSortByName}
+                  aria-label={`Sort properties by name${nameSortOrder ? `, currently ${nameSortOrder === 'asc' ? 'ascending' : 'descending'}` : ''}`}
+                >
+                  <span>Property Name</span>
+                  <span aria-hidden="true">{nameSortOrder === 'asc' ? '↑' : nameSortOrder === 'desc' ? '↓' : '⇅'}</span>
+                </button>
+              </th>
               <th>Warnings</th>
               <th onClick={handleSortByOpenNotes} className="sort-header">
                 <span>Notes open</span>

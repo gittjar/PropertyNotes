@@ -923,6 +923,27 @@ input:focus {
   cursor: pointer;
 }
 
+.property-name-sort {
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  letter-spacing: inherit;
+  text-transform: inherit;
+}
+
+.property-name-sort:hover,
+.property-name-sort:focus-visible {
+  color: var(--primary);
+}
+
+.property-name-sort:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 3px;
+  border-radius: 3px;
+}
+
 .ReactModal__Overlay {
   background: rgba(15, 23, 42, 0.62) !important;
 }
